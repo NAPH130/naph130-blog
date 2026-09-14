@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 import type { PostItem } from '@/utils/posts';
 import { t, type I18nKey } from '@/i18n';
 
@@ -60,13 +60,25 @@ export const PostList: React.FC<PostListProps> = ({ postsByLocale }) => {
                   </a>
                 </h2>
 
-                {/* 发布时间栏 */}
-                {post.date && (
-                  <div className="flex items-center gap-1.5 mt-2.5 text-xs text-neutral-600 font-mono">
-                    <Calendar className="w-3.5 h-3.5 text-neutral-700" />
-                    <span>{post.date}</span>
-                  </div>
-                )}
+                {/* 发布时间与预估阅读时间栏 */}
+                <div className="flex flex-wrap items-center gap-3.5 mt-2.5 text-xs text-neutral-600 font-mono">
+                  {post.date && (
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-neutral-700" />
+                      <span>{post.date}</span>
+                    </div>
+                  )}
+                  {post.readingTime !== undefined && (
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-neutral-700" />
+                      <span>
+                        {currentLocale === 'en_us'
+                          ? `~${post.readingTime} min`
+                          : `约${post.readingTime}分钟`}
+                      </span>
+                    </div>
+                  )}
+                </div>
                 {/* 简介正文 */}
                 {post.description && (
                   <p className="text-sm text-neutral-700 mt-3 leading-relaxed line-clamp-2">

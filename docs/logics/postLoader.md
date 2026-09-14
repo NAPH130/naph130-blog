@@ -48,6 +48,22 @@ src/content/posts/
 ### 1.3 客户端即时切语联动
 `PostList` 组件挂载 `naph130:lang-change` 全局事件广播监听。当在导航栏切换语言为 English 时，`currentLocale` 状态立刻更新为 `en_us`，列表无刷新切换展示英文文章工程，**零页面跳转、零白屏抖动**。
 
+### 1.4 文章字数与预估阅读时间计算 (`calculateReadingTime`)
+在文章列表卡片中追加“预估阅读时间”字段（中文展示格式严格为 `约<time>分钟`，英文模式下对应 `~<time> min`）：
+1. **中英文混合字数统计算法 (`calculateWordCount`)**：
+   - 过滤 HTML/Markdown 冗余标签；
+   - 中文字符按单字匹配统计（`[\u4e00-\u9fff]`）；
+   - 英文单词按空白符拆分词数统计；
+   - 最终有效字数等于中文字数与英文词数之和。
+2. **阅读时长换算模型**：
+   - 以人眼常规沉浸式阅读速度 `300 字/分钟` 为基准；
+   - 计算公式：`readingTime = Math.max(1, Math.ceil(wordCount / 300))`，确保篇幅较短的文章至少为 `1 分钟`。
+3. **Frontmatter 手动覆盖支持**：
+   - `content.config.ts` 的 schema 中注册 `readingTime: z.number().optional()`；
+   - 若文章在 Markdown Frontmatter 中显式指定了 `readingTime`，则优先采用指定值，否则自动根据文章正文内容动态计算。
+4. **卡片 UI 排版规范**：
+   - 在卡片标题下方的元数据行中与发布时间并列展示，前置 Lucide `Clock` 时钟微标，字阶与色值保持统一的 `text-xs text-neutral-600 font-mono`。
+
 ---
 
 ## 2. 踩坑点与 Bug 修复记录

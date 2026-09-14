@@ -15,9 +15,9 @@
 | **05** | **设置面板与毛坯极简设计** | [`logics/settingsPanel.md`](./logics/settingsPanel.md) | Anti-Polish / Raw Aesthetic 工坊风格、严格全 0 圆角（rounded-none）、独立磨砂图层。 | 绝对定位溢出触发原生滚动条、路由转场快照拉伸、首页 0 模糊状态下背景虚化缺失。 |
 | **06** | **粒子时间时钟与局部差分更新** | [`logics/particleClock.md`](./logics/particleClock.md) | 8 槽位独立粒子池、字符差分检测（Differential Update）、比例字宽权重模型。 | 全局每秒重排导致小时分钟跳闪、全画布扫描导致的冒号周边噪点。 |
 | **07** | **语言切换与悬浮菜单** | [`logics/languageSwitcher.md`](./logics/languageSwitcher.md) | CSS-Only 悬停桥接浮层、localStorage 持久化、CustomEvent 全局事件广播解耦。 | 菜单与图标间物理空白盲区导致光标移入时提前失焦关闭。 |
-| **08** | **文章动态页侧边栏多卡片** | [`logics/blogSidebar.md`](./logics/blogSidebar.md) | 三卡片堆叠（简介卡片、站点统计、实时翻月日历）、磨砂玻璃视觉语言、动态集合统计。 | 翻月网格行数差异引发卡片高度推拉抖动。 |
-| **09** | **文章卡片封面渐变过渡** | [`logics/postCardGradient.md`](./logics/postCardGradient.md) | CSS mask-image 线性 Alpha 通道透明度遮罩、半透明磨砂底座无缝相融、悬停微缩放。 | 实体渐变覆盖层污染半透明磨砂底座导致死白色块。 |
-| **10** | **文章工程化分语言加载** | [`logics/postLoader.md`](./logics/postLoader.md) | 分语言 locale 子目录切分、同级工程相对图片自动哈希解析、即时多语言响应切替。 | 同级相对图片资源在静态编译中找不到打包路径引发 404。 |
+| **08** | **文章动态页侧边栏多卡片** | [`logics/blogSidebar.md`](./logics/blogSidebar.md) | 多卡片按需架构（showStats 开关、个人简介与实时日历）、磨砂玻璃视觉语言、分语言动态统计。 | 翻月网格行数差异抖动、非标 Tailwind 类名小屏坍塌、固定最小高度屏幕截断。 |
+| **09** | **文章卡片封面渐变过渡** | [`logics/postCardGradient.md`](./logics/postCardGradient.md) | CSS 响应式 mask-image 线性 Alpha 通道遮罩、半透明磨砂底座无缝相融、悬停微缩放。 | 实体渐变覆层污染磨砂底色、移动端纵向堆叠固定横向遮罩导致发虚。 |
+| **10** | **文章工程化分语言加载** | [`logics/postLoader.md`](./logics/postLoader.md) | 分语言 locale 子目录切分、同级工程相对图片自动哈希解析、中英字数混合预估阅读时间、即时多语言响应切替。 | 同级相对图片资源在静态编译中找不到打包路径引发 404。 |
 
 ---
 
