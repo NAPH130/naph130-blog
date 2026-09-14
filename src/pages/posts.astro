@@ -8,35 +8,54 @@ import { getAllLocalePosts } from '@/utils/posts';
 // 分语言获取所有语言子目录下的文章工程
 const postsByLocale = await getAllLocalePosts();
 
+// 统计各语言包数据
+const statsByLocale: Record<string, { postCount: number; tagCount: number }> = {};
+const countsByLocale: Record<string, number> = {};
+
+for (const [locale, list] of Object.entries(postsByLocale)) {
+  statsByLocale[locale] = {
+    postCount: list.length,
+    tagCount: new Set(list.flatMap((p) => p.tags)).size,
+  };
+  countsByLocale[locale] = list.length;
+}
+
 // 默认初始展示中文语言包统计
 const defaultPosts = postsByLocale['zh_cn'] || [];
 const postCount = defaultPosts.length;
-const tagCount = new Set(defaultPosts.flatMap((p) => p.tags)).size;
+const tagCount = statsByLocale['zh_cn']?.tagCount || 0;
 ---
 
 <BaseLayout title="文章 - NAPH130's Blog" currentPath="/posts">
-  <div class="flex-1 w-full min-h-0 flex items-center justify-center p-3 sm:p-5 lg:p-6 overflow-hidden">
-    {/* 严格单屏视口约束容器：限制最大高度 max-h-[calc(100vh-7.5rem)]，激活内部专属 Slide Bar */}
-    <div class="w-full max-w-7xl h-full max-h-[calc(100vh-7.5rem)] min-h-0 flex flex-col lg:flex-row gap-5 lg:gap-7 items-stretch overflow-hidden">
-      {/* 左侧栏：三卡片全高舒展排布，底端与右侧严格齐平 */}
-      <div class="w-full lg:w-72 xl:w-80 shrink-0 h-full min-h-0 flex flex-col overflow-hidden">
+  <div class="flex-1 w-full min-h-0 flex items-center justify-center p-3 sm:p-5 lg:p-6 overflow-y-auto lg:overflow-hidden">
+    {/* 视口约束容器：桌面端单屏锁定触发右侧 Slide Bar，移动端自适应舒展 */}
+    <div class="w-full max-w-7xl h-auto lg:h-full lg:max-h-[calc(100vh-7.5rem)] min-h-0 flex flex-col lg:flex-row gap-5 lg:gap-7 items-stretch my-auto">
+      {/* 左侧栏：精简双卡片全高舒展排布，取消站点统计 */}
+      <div class="w-full lg:w-72 xl:w-80 shrink-0 h-auto lg:h-full min-h-0 flex flex-col overflow-visible lg:overflow-hidden">
         <BlogSidebar
           postCount={postCount}
           tagCount={tagCount}
           momentCount={0}
+          statsByLocale={statsByLocale}
+          showStats={false}
           client:load
         />
       </div>
 
       {/* 右侧：等高文章主面板 (高度受控，内部触发专属 Slide Bar) */}
-      <div class="flex-1 min-w-0 w-full h-full min-h-0 rounded-3xl bg-white/20 backdrop-blur-2xl border border-white/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden">
+      <div class="flex-1 min-w-0 w-full h-auto lg:h-full min-h-[450px] lg:min-h-0 rounded-3xl bg-white/20 backdrop-blur-2xl border border-white/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden">
         {/* 固定顶部标头栏 (不随列表滚动) */}
         <div class="p-6 sm:p-8 pb-4 shrink-0">
-          <PageHeader type="posts" count={postCount} client:load />
+          <PageHeader
+            type="posts"
+            count={postCount}
+            countsByLocale={countsByLocale}
+            client:load
+          />
         </div>
 
         {/* 内部文章流滚动区：右侧专属 Slide Bar */}
-        <div class="flex-1 min-h-0 overflow-y-auto px-6 sm:px-8 pb-8 custom-slidebar pr-3 sm:pr-5">
+        <div class="flex-1 min-h-0 overflow-y-auto pl-6 sm:pl-8 pr-3 sm:pr-5 pb-8 custom-slidebar">
           <PostList postsByLocale={postsByLocale} client:load />
         </div>
       </div>

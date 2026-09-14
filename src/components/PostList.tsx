@@ -90,23 +90,20 @@ export const PostList: React.FC<PostListProps> = ({ postsByLocale }) => {
               )}
             </div>
 
-            {/* 右侧封面图：左侧横向渐变淡出消融遮罩 */}
+            {/* 右侧封面图：自适应渐变淡出消融遮罩（桌面端向右消融，移动端向下消融） */}
             {post.coverSrc && (
-              <div
-                className="w-full md:w-[42%] lg:w-[40%] shrink-0 h-44 md:h-auto min-h-[170px] sm:min-h-[190px] relative overflow-hidden"
-                style={{
-                  maskImage:
-                    'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0.85) 30%, black 50%)',
-                  WebkitMaskImage:
-                    'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.25) 10%, rgba(0,0,0,0.85) 30%, black 50%)',
-                }}
+              <a
+                href={`/posts/${post.slug}`}
+                tabIndex={-1}
+                aria-hidden="true"
+                className="w-full md:w-[42%] lg:w-[40%] shrink-0 h-44 md:h-auto min-h-[170px] sm:min-h-[190px] relative overflow-hidden post-cover-mask block cursor-pointer"
               >
                 <img
                   src={post.coverSrc}
                   alt={post.title}
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500 select-none pointer-events-none"
                 />
-              </div>
+              </a>
             )}
           </article>
         );

@@ -63,6 +63,43 @@
   scrollbar-color: rgba(255, 255, 255, 0.45) rgba(255, 255, 255, 0.1);
 }
 
+/* 文章卡片封面渐变遮罩：移动端自上而下，桌面端自左向右平滑消融 */
+.post-cover-mask {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 10%,
+    rgba(0, 0, 0, 0.85) 30%,
+    black 50%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 10%,
+    rgba(0, 0, 0, 0.85) 30%,
+    black 50%
+  );
+}
+
+@media (min-width: 768px) {
+  .post-cover-mask {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.25) 10%,
+      rgba(0, 0, 0, 0.85) 30%,
+      black 50%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.25) 10%,
+      rgba(0, 0, 0, 0.85) 30%,
+      black 50%
+    );
+  }
+}
+
 /* 彻底冻结导航栏在 View Transitions 转场中的任何纵向/横向形变动画 */
 ::view-transition-group(site-header-nav) {
   animation: none !important;

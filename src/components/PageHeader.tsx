@@ -4,9 +4,10 @@ import { t, type I18nKey } from '@/i18n';
 interface PageHeaderProps {
   type: 'posts' | 'moments';
   count: number;
+  countsByLocale?: Record<string, number>;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ type, count }) => {
+export const PageHeader: React.FC<PageHeaderProps> = ({ type, count, countsByLocale }) => {
   const [lang, setLang] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('naph130_lang');
@@ -36,6 +37,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ type, count }) => {
   const prefix = t('pages.totalPrefix' as I18nKey, targetLocale);
   const suffix = t(suffixKey as I18nKey, targetLocale);
   const title = t(titleKey as I18nKey, targetLocale);
+  const currentCount = countsByLocale?.[targetLocale] ?? count;
 
   return (
     <div className="flex items-baseline justify-between pb-6 border-b border-neutral-300/60 select-none">
@@ -44,7 +46,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ type, count }) => {
       </h1>
       <div className="text-sm font-mono text-neutral-600 font-medium">
         {prefix}
-        <span className="text-xl font-bold text-neutral-900 mx-1">{count}</span>
+        <span className="text-xl font-bold text-neutral-900 mx-1">{currentCount}</span>
         {suffix}
       </div>
     </div>

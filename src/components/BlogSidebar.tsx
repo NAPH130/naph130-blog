@@ -6,12 +6,16 @@ interface BlogSidebarProps {
   postCount?: number;
   tagCount?: number;
   momentCount?: number;
+  statsByLocale?: Record<string, { postCount: number; tagCount: number }>;
+  showStats?: boolean;
 }
 
 export const BlogSidebar: React.FC<BlogSidebarProps> = ({
   postCount = 1,
   tagCount = 3,
   momentCount = 0,
+  statsByLocale,
+  showStats = true,
 }) => {
   const [lang, setLang] = useState<string>(() => {
     if (typeof window !== 'undefined') {
@@ -106,12 +110,19 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
   const textSiteStats = t('sidebar.siteStats' as I18nKey, targetLocale);
   const textDaysUnit = t('sidebar.daysUnit' as I18nKey, targetLocale);
 
+  const currentPostCount = statsByLocale?.[targetLocale]?.postCount ?? postCount;
+  const currentTagCount = statsByLocale?.[targetLocale]?.tagCount ?? tagCount;
+
   return (
     <aside className="w-full h-full min-h-0 flex flex-col gap-3.5 select-none font-sans">
       {/* 1. 个人简介卡片：与右侧面板完全对齐的磨砂质感，色调生动不发灰 */}
-      <div className="flex-1 min-h-[190px] frosted-glass-card rounded-2xl p-4 sm:p-4.5 text-center relative flex flex-col justify-between">
+      <div
+        className={`frosted-glass-card rounded-2xl p-4 sm:p-5 text-center relative flex flex-col justify-between ${
+          showStats ? 'flex-1 min-h-[190px]' : 'flex-[0.9] min-h-[220px]'
+        }`}
+      >
         {/* 圆形头像 */}
-        <div className="mx-auto w-18 h-18 sm:w-20 sm:h-20 rounded-full border-2 border-white/80 shadow-sm overflow-hidden relative group">
+        <div className="mx-auto w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-full border-2 border-white/80 shadow-sm overflow-hidden relative group">
           <img
             src="/avatar.jpg"
             alt="NAPH130"
@@ -131,7 +142,7 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
         <div className="grid grid-cols-3 gap-2 mt-auto pt-3 border-t border-white/30">
           <div className="flex flex-col items-center">
             <span className="text-base sm:text-lg font-bold font-mono text-neutral-900">
-              {postCount}
+              {currentPostCount}
             </span>
             <span className="text-[11px] font-medium text-neutral-700 mt-0.5">
               {textPosts}
@@ -139,7 +150,7 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
           </div>
           <div className="flex flex-col items-center border-x border-white/25">
             <span className="text-base sm:text-lg font-bold font-mono text-neutral-900">
-              {tagCount}
+              {currentTagCount}
             </span>
             <span className="text-[11px] font-medium text-neutral-700 mt-0.5">
               {textTags}
@@ -156,66 +167,72 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
         </div>
       </div>
 
-      {/* 2. 站点统计数据卡片：与右侧面板完全对齐的磨砂质感，内部零灰底色块 */}
-      <div className="flex-[0.85] min-h-[150px] frosted-glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between">
-        <div className="flex items-center gap-2 pb-2 border-b border-white/30 text-sm font-bold tracking-wider text-neutral-900 shrink-0">
-          <BarChart3 className="w-4 h-4 text-neutral-800" />
-          <span>{textSiteStats}</span>
+      {/* 2. 站点统计数据卡片：与右侧面板完全对齐的磨砂质感 (可选) */}
+      {showStats && (
+        <div className="flex-[0.85] min-h-[150px] frosted-glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between">
+          <div className="flex items-center gap-2 pb-2 border-b border-white/30 text-sm font-bold tracking-wider text-neutral-900 shrink-0">
+            <BarChart3 className="w-4 h-4 text-neutral-800" />
+            <span>{textSiteStats}</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mt-auto">
+            <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
+              <FileText className="w-4 h-4 text-neutral-700 shrink-0" />
+              <div>
+                <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
+                  {currentPostCount}
+                </div>
+                <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
+                  {textPosts}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
+              <Hash className="w-4 h-4 text-neutral-700 shrink-0" />
+              <div>
+                <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
+                  {currentTagCount}
+                </div>
+                <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
+                  {textTags}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
+              <Sparkles className="w-4 h-4 text-neutral-700 shrink-0" />
+              <div>
+                <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
+                  {momentCount}
+                </div>
+                <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
+                  {textMoments}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
+              <Clock className="w-4 h-4 text-neutral-700 shrink-0" />
+              <div>
+                <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
+                  1 {textDaysUnit}
+                </div>
+                <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
+                  {textRunning}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-2 mt-auto">
-          <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
-            <FileText className="w-4 h-4 text-neutral-700 shrink-0" />
-            <div>
-              <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
-                {postCount}
-              </div>
-              <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
-                {textPosts}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
-            <Hash className="w-4 h-4 text-neutral-700 shrink-0" />
-            <div>
-              <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
-                {tagCount}
-              </div>
-              <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
-                {textTags}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
-            <Sparkles className="w-4 h-4 text-neutral-700 shrink-0" />
-            <div>
-              <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
-                {momentCount}
-              </div>
-              <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
-                {textMoments}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 p-2 rounded-xl border border-white/25 hover:bg-white/10 transition-colors">
-            <Clock className="w-4 h-4 text-neutral-700 shrink-0" />
-            <div>
-              <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
-                1 {textDaysUnit}
-              </div>
-              <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
-                {textRunning}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* 3. 磨砂玻璃实时日历卡片：与右侧面板完全对齐的磨砂质感 (固定 42 格无堆叠) */}
-      <div className="flex-[1.3] min-h-[250px] frosted-glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between">
+      <div
+        className={`frosted-glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between ${
+          showStats ? 'flex-[1.3] min-h-[250px]' : 'flex-[1.1] min-h-[260px]'
+        }`}
+      >
         {/* 日历头部 */}
         <div className="flex items-center justify-between pb-2 border-b border-white/30 shrink-0">
           <div className="flex items-center gap-1.5">
