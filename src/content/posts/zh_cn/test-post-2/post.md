@@ -16,5 +16,3 @@ tags:
 ## 测试小节标题
 
 正文段落示例，用于测试 Markdown 解析与正文排版。
-
-__omp_shell("[配套封面图](cover.png)")

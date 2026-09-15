@@ -46,18 +46,17 @@ export const PostList: React.FC<PostListProps> = ({ postsByLocale }) => {
     <div className="space-y-5">
       {posts.map((post) => {
         return (
-          <article
+          <a
             key={post.id}
-            className="group relative flex flex-col md:flex-row items-stretch justify-between rounded-2xl bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/25 hover:border-white/40 shadow-sm hover:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 overflow-hidden select-none"
+            href={`/posts/${post.slug}`}
+            className="group relative flex flex-col md:flex-row items-stretch justify-between rounded-2xl bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/25 hover:border-white/40 shadow-sm hover:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 overflow-hidden select-none cursor-pointer block no-underline text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50"
           >
             {/* 左侧正文与元数据区 */}
             <div className="flex-1 p-6 sm:p-7 flex flex-col justify-between min-w-0 z-10">
               <div>
                 {/* 标题 */}
                 <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 group-hover:text-black transition-colors leading-snug">
-                  <a href={`/posts/${post.slug}`} className="focus:outline-none">
-                    {post.title}
-                  </a>
+                  {post.title}
                 </h2>
 
                 {/* 发布时间与预估阅读时间栏 */}
@@ -104,20 +103,18 @@ export const PostList: React.FC<PostListProps> = ({ postsByLocale }) => {
 
             {/* 右侧封面图：自适应渐变淡出消融遮罩（桌面端向右消融，移动端向下消融） */}
             {post.coverSrc && (
-              <a
-                href={`/posts/${post.slug}`}
-                tabIndex={-1}
+              <div
                 aria-hidden="true"
-                className="w-full md:w-[42%] lg:w-[40%] shrink-0 h-44 md:h-auto min-h-[170px] sm:min-h-[190px] relative overflow-hidden post-cover-mask block cursor-pointer"
+                className="w-full md:w-[42%] lg:w-[40%] shrink-0 h-44 md:h-auto min-h-[170px] sm:min-h-[190px] relative overflow-hidden post-cover-mask block"
               >
                 <img
                   src={post.coverSrc}
                   alt={post.title}
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500 select-none pointer-events-none"
                 />
-              </a>
+              </div>
             )}
-          </article>
+          </a>
         );
       })}
     </div>

@@ -22,10 +22,23 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
     loadSavedSettings()
   );
 
-  // 语言状态管理 (默认 defaultLanguage: 'zh')
+  // 语言状态管理 (根据当前路径及 localStorage 智能识别)
   const [currentLang, setCurrentLang] = useState<string>(() => {
     if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path.includes('/en_us/') || path.startsWith('/en/')) {
+        return 'en';
+      }
+      if (path.includes('/zh_cn/') || path.startsWith('/zh/')) {
+        return 'zh';
+      }
       return localStorage.getItem('naph130_lang') || defaultLanguage;
+    }
+    if (currentPath.includes('/en_us/') || currentPath.startsWith('/en/')) {
+      return 'en';
+    }
+    if (currentPath.includes('/zh_cn/') || currentPath.startsWith('/zh/')) {
+      return 'zh';
     }
     return defaultLanguage;
   });
@@ -36,6 +49,18 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('naph130_lang', name);
       window.dispatchEvent(new CustomEvent('naph130:lang-change', { detail: name }));
+
+      // 若当前正处于分语言文章详情页 (/posts/[locale]/[slug])，平滑切换至目标语言对应文章路由
+      const path = window.location.pathname;
+      const match = path.match(/^\/posts\/(zh_cn|en_us)\/(.+)$/);
+      if (match) {
+        const currentLocaleInUrl = match[1];
+        const postSlug = match[2];
+        const targetLocaleInUrl = name === 'en' || name === 'en_us' ? 'en_us' : 'zh_cn';
+        if (currentLocaleInUrl !== targetLocaleInUrl) {
+          window.location.href = `/posts/${targetLocaleInUrl}/${postSlug}`;
+        }
+      }
     }
   };
 
@@ -76,6 +101,14 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
       setActivePath(path);
       setIsSettingsOpen(false);
       setIsLangOpen(false);
+
+      if (path.includes('/en_us/') || path.startsWith('/en/')) {
+        setCurrentLang('en');
+        localStorage.setItem('naph130_lang', 'en');
+      } else if (path.includes('/zh_cn/') || path.startsWith('/zh/')) {
+        setCurrentLang('zh');
+        localStorage.setItem('naph130_lang', 'zh');
+      }
     };
 
     handlePathUpdate();

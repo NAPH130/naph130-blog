@@ -9,18 +9,20 @@ import '@/styles/global.css';
 interface Props {
   title?: string;
   currentPath?: string;
+  lang?: string;
 }
 
 const {
   title = siteConfig.title,
   currentPath = '/',
+  lang = 'zh-CN',
 } = Astro.props;
 
 const optimizedBg = await getImage({ src: bgImage });
 ---
 
 <!doctype html>
-<html lang="zh-CN" class="h-full overflow-hidden">
+<html lang={lang} class="h-full overflow-hidden">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

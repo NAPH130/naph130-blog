@@ -36,6 +36,12 @@
 | `/moments` | `nav.moments` | 动态 | Moments |
 | `/friends` | `nav.friends` | 友链 | Friends |
 
+### 1.3 路径感知自适应与文章详情页跨语言平滑路由
+1. **URL 优先语言探测**：在直接通过外链访问 `/posts/en_us/...` 或 `/posts/zh_cn/...` 时，`HeaderNav` 与 `BaseLayout` 优先根据 URL 中的 locale 片段初始化语言状态与 `<html lang>` 属性，保证即使客户端 localStorage 未设定也能准确匹配文章语言。
+2. **文章跨语言即时路由重定向**：
+   - 当用户在阅读 `/posts/en_us/test-post-1` 并在菜单中选择“简体中文”时，系统侦测到处于分语言文章路由，自动重定向至 `/posts/zh_cn/test-post-1`；
+   - 反之，在 `/posts/zh_cn/test-post-1` 选择“English”时自动重定向至 `/posts/en_us/test-post-1`，彻底解决“切语后页面仍停留在异语种文章正文”的断层问题。
+
 ---
 
 ## 2. 踩坑点与 Bug 修复记录
@@ -44,3 +50,13 @@
 - **现象**：在右上角切换至 English 后，简介内容变为了英文，但顶部导航栏仍然显示“首页、简介、文章、动态、友链”。
 - **原因**：导航栏选项数组中原先写死了静态字符串 `label: '首页'`。
 - **修复**：在 `i18nKeys.ts` 与语言包中补充导航词条，`HeaderNav` 改为通过 `t('nav.' + item.key, targetLocale)` 动态推导标签，实现与语言状态的即时联动。
+
+### 坑 2：直接访问英文文章时导航栏与元数据依然显示中文、切语未跳转对应文章
+- **现象**：直接输入链接访问 `/posts/en_us/test-post-1` 时，顶部导航栏仍为中文，返回按钮显示“返回”，目录栏显示“目录 2节”，阅读时间显示“约1分钟”，且在菜单切换为中文后页面 URL 毫无变化。
+- **原因**：此前全站语言状态单纯从 `localStorage` 获取，未结合路由参数判定；详情页外壳组件写死了中文文本；语言切换菜单仅做了事件派发，没有对文章详情页的分语言路由进行换向。
+- **修复**：
+  1. `BaseLayout` 支持 `lang` 属性并同步更新 `<html lang={lang}>`；
+  2. `HeaderNav` 初始化及路由更新时增加 URL 路径正则嗅探（`/en_us/` $\rightarrow$ `en`）；
+  3. `TableOfContents` 增加 `locale` 属性，标头支持 `Table of Contents`，徽章单位由 `节` 变为 `sections`，进度由 `当前进度` 变为 `Progress`；
+  4. `HeaderNav.handleSelectLang` 增加文章路由正则匹配，在切语时自动在 `zh_cn` 与 `en_us` 间换向跳转。
+

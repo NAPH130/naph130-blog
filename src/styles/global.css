@@ -124,3 +124,421 @@
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.6),
     0 12px 32px -8px rgba(0, 0, 0, 0.15);
 }
+
+/* 文章详情页专属晶透磨砂玻璃胶囊返回按钮 (Frosted Glass Pill) */
+.frosted-glass-back-btn {
+  background-color: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.12),
+    0 2px 6px -1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+  color: #1e293b;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.frosted-glass-back-btn:hover {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 12px 28px -4px rgba(0, 0, 0, 0.18),
+    0 4px 10px -1px rgba(0, 0, 0, 0.08),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.frosted-glass-back-btn:active {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(0px) scale(0.96);
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* 文章详情页顶部封面遮罩：上方完整清晰，下方渐变平滑消融融入磨砂正文卡片 */
+.post-detail-cover-mask {
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 35%,
+    rgba(0, 0, 0, 0.8) 55%,
+    rgba(0, 0, 0, 0.45) 75%,
+    rgba(0, 0, 0, 0.12) 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 35%,
+    rgba(0, 0, 0, 0.8) 55%,
+    rgba(0, 0, 0, 0.45) 75%,
+    rgba(0, 0, 0, 0.12) 90%,
+    transparent 100%
+  );
+}
+
+/* Markdown 文章正文排版系统 */
+.markdown-content {
+  color: #1a1a1a;
+  line-height: 1.85;
+  font-size: 1.05rem;
+  word-break: break-word;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  color: #111827;
+  font-family: 'Comfortaa', 'Outfit', sans-serif;
+  font-weight: 700;
+  scroll-margin-top: 6rem;
+  line-height: 1.35;
+}
+
+.markdown-content h1 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.markdown-content h2 {
+  font-size: 1.5rem;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.markdown-content h3 {
+  font-size: 1.25rem;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content h4 {
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content p {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  color: #262626;
+}
+
+.markdown-content a {
+  color: #0284c7;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+
+.markdown-content a:hover {
+  color: #0369a1;
+}
+
+.markdown-content strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.markdown-content em {
+  font-style: italic;
+  color: #374151;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+  padding-left: 1.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+  padding-left: 1.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-content li {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.markdown-content blockquote {
+  padding: 1rem 1.35rem;
+  margin: 1.5rem 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0;
+  color: #1f2937;
+  font-style: italic;
+}
+
+/* 表格容器与排版 (Table Styling - 零圆角) */
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  margin: 1.75rem 0;
+  font-size: 0.95rem;
+  border-radius: 0 !important;
+  overflow: hidden;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.markdown-content th {
+  background-color: rgba(255, 255, 255, 0.25);
+  padding: 0.85rem 1.15rem;
+  font-weight: 700;
+  color: #111827;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.markdown-content td {
+  padding: 0.75rem 1.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #262626;
+}
+
+.markdown-content tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-content tr:hover td {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 代码高亮块容器与排版 (Obsidian Header Bar + Line Numbers - 零圆角) */
+.code-block-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 1.75rem 0;
+  border-radius: 0 !important;
+  overflow: hidden;
+  background-color: #0c1017;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.code-block-wrapper:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* 顶栏：左侧代码类型，右侧复制按钮 */
+.code-block-wrapper .code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 1rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 左侧语言标识 */
+.code-block-wrapper .code-lang-label {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.02em;
+}
+
+/* 右侧复制按钮 (零圆角) */
+.code-block-wrapper .code-copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.2rem 0.5rem;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 0 !important;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.15s ease;
+}
+
+.code-block-wrapper .code-copy-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.code-block-wrapper .code-copy-btn:active {
+  transform: scale(0.96);
+}
+
+.code-block-wrapper .code-copy-btn.copied {
+  color: #34d399;
+  background-color: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.code-block-wrapper pre {
+  margin: 0 !important;
+  padding-top: 0.875rem !important;
+  padding-bottom: 0.875rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background-color: #0c1017 !important;
+  border-radius: 0 !important;
+  overflow-x: auto;
+  scrollbar-width: auto !important;
+  scrollbar-color: auto !important;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.45 !important;
+}
+
+.code-block-wrapper pre code {
+  display: grid !important;
+  counter-reset: line-number;
+  min-width: 100%;
+  width: max-content;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.code-block-wrapper pre code .line {
+  display: flex;
+  align-items: baseline;
+  padding: 0 1.25rem 0 0;
+  min-width: 100%;
+  min-height: 1.45em;
+  line-height: 1.45 !important;
+  transition: background-color 0.15s ease;
+}
+
+.code-block-wrapper pre code .line:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* 行号列：固定左侧微边框与灰度数字 (不可选，纯净复制) */
+.code-block-wrapper pre code .line::before {
+  counter-increment: line-number;
+  content: counter(line-number);
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: #0c1017;
+  display: inline-block;
+  width: 2.85rem;
+  min-width: 2.85rem;
+  padding-right: 0.75rem;
+  margin-right: 0.875rem;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.22);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: inherit;
+  font-family: inherit;
+}
+
+/* 滚动条圆角与边缘防溢出 (禁用箭头、内缩轨道、彻底消除边角溢出) */
+.code-block-wrapper pre::-webkit-scrollbar {
+  height: 5px;
+}
+.code-block-wrapper pre::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.code-block-wrapper pre::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0 1.25rem;
+}
+.code-block-wrapper pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 0 !important;
+}
+.code-block-wrapper pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Fallback: 原生 pre 样式 (当脚本未包裹时 - 零圆角) */
+.markdown-content pre:not([data-enhanced="true"]) {
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 !important;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  scrollbar-width: thin;
+}
+
+.markdown-content pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* 行内代码徽章 (Inline Code - 零圆角) */
+.markdown-content :not(pre) > code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0 !important;
+  background-color: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #0f172a;
+}
+
+/* 正文图片 (零圆角) */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0 !important;
+}
+
+/* 分割线 */
+.markdown-content hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.6), transparent);
+  margin: 2.5rem 0;
+}
+
+/* 核心铁律：文章详情页 Markdown 渲染的内容一律不使用圆角 (Strict Zero Border Radius) */
+.markdown-content,
+.markdown-content *,
+.markdown-content *::before,
+.markdown-content *::after {
+  border-radius: 0 !important;
+}

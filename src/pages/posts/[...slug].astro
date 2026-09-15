@@ -1,0 +1,267 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TableOfContents from '@/components/TableOfContents';
+import { getCollection, render } from 'astro:content';
+import { resolvePostCover, calculateReadingTime } from '@/utils/posts';
+import { ArrowLeft, Calendar, Clock, Tag } from 'lucide-react';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+  return allPosts.map((post) => ({
+    params: { slug: post.id.replace(/\/post(\.md)?$/, '') },
+    props: { post },
+  }));
+}
+
+const { slug } = Astro.params;
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+// 元数据解析
+const title = post.data.title;
+const dateVal = post.data.date || post.data.pubDate || new Date();
+const dateStr =
+  dateVal instanceof Date
+    ? dateVal.toISOString().split('T')[0]
+    : String(dateVal);
+const tags = post.data.tags || [];
+
+// 封面图片解析
+const coverSrc = resolvePostCover(post.id, post.data.cover);
+
+// 预估阅读时间计算
+const contentText = (post.body || '') + ' ' + (post.data.description || '');
+const calculatedReadingTime = calculateReadingTime(contentText);
+const readingTime = post.data.readingTime ?? calculatedReadingTime;
+
+// 提取当前文章所属语言 locale 与国际化变量
+const postLocale = post.id.startsWith('en_us') ? 'en_us' : 'zh_cn';
+const isEnglish = postLocale === 'en_us';
+const backText = isEnglish ? 'Back' : '返回';
+const readingTimeText = isEnglish ? `~${readingTime} min read` : `约${readingTime}分钟`;
+---
+
+<BaseLayout
+  title={`${title} - NAPH130's Blog`}
+  currentPath={`/posts/${slug}`}
+  lang={isEnglish ? 'en' : 'zh-CN'}
+>
+  {/* 文章显示页全屏滚动视口容器 */}
+  <div
+    id="post-scroll-container"
+    class="flex-1 w-full min-h-0 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 custom-slidebar"
+  >
+    <div class="w-full max-w-7xl mx-auto">
+      {/* 主体两栏栅格：中间正文卡片 + 右侧目录导航栏 */}
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_310px] gap-6 lg:gap-8 items-stretch pb-16">
+        {/* 左侧正文列：无 overflow-hidden 外壳以支持真正的全滚动流程 Sticky 常驻返回胶囊 */}
+        <div class="relative w-full min-w-0">
+          {/* 随滚动持续常驻左上角的晶透磨砂胶囊返回按钮 (Sticky Floating Pill) */}
+          <div class="sticky top-2 sm:top-3 z-30 pointer-events-none h-0">
+            <div class="inline-block pointer-events-auto pl-4 sm:pl-6 pt-3 sm:pt-4">
+              <a
+                href="/posts"
+                class="frosted-glass-back-btn inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full font-medium text-xs sm:text-sm select-none cursor-pointer group"
+                aria-label={backText}
+              >
+                <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-250 group-hover:-translate-x-1 shrink-0" />
+                <span class="font-semibold tracking-wide">{backText}</span>
+              </a>
+            </div>
+          </div>
+
+          {/* 中间栏：Markdown 文章内容主面板（与 /posts 及 /intro 卡片质感严格对齐） */}
+          <main class="w-full min-w-0 rounded-3xl bg-white/20 backdrop-blur-2xl border border-white/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] overflow-hidden">
+            {/* 1. 最上面：Cover 封面图片，自上向下渐变消融（完全依赖透明度遮罩自然融进磨砂卡片，无任何色块断层） */}
+            {coverSrc && (
+              <div class="w-full h-64 sm:h-80 md:h-96 relative overflow-hidden select-none pointer-events-none rounded-t-3xl post-detail-cover-mask">
+                <img
+                  src={coverSrc}
+                  alt={title}
+                  class="w-full h-full object-cover object-center"
+                />
+              </div>
+            )}
+
+            {/* 2. 文章标题与元数据区域 */}
+            <div class={`p-6 sm:p-10 lg:p-12 ${coverSrc ? '-mt-6 sm:-mt-10 relative z-10' : 'pt-16 sm:pt-20'}`}>
+              {/* Title 标题 */}
+              <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-['Comfortaa'] text-neutral-900 tracking-tight leading-snug">
+                {title}
+              </h1>
+
+              {/* Title 下面的标签徽章 */}
+              {tags.length > 0 && (
+                <div class="flex flex-wrap items-center gap-2 mt-4 select-none">
+                  <Tag className="w-3.5 h-3.5 text-neutral-700" />
+                  {tags.map((tag: string) => (
+                    <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/25 text-neutral-800 border border-white/40 shadow-2xs hover:border-white/60 transition-colors">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* 标签再下面显示：时间、预估阅读时间 */}
+              <div class="flex flex-wrap items-center gap-4 sm:gap-6 mt-4 pb-6 border-b border-white/30 text-xs sm:text-sm font-mono text-neutral-700 select-none">
+                {dateStr && (
+                  <div class="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-neutral-800" />
+                    <span>{dateStr}</span>
+                  </div>
+                )}
+                <div class="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-neutral-800" />
+                  <span>{readingTimeText}</span>
+                </div>
+              </div>
+
+              {/* 3. 渲染 Markdown 正文内容 (支持表格、代码高亮等) */}
+              <article class="markdown-content mt-8 select-text">
+                <Content />
+              </article>
+            </div>
+          </main>
+        </div>
+
+        {/* 右边栏：文章目录导航栏 (保持屏幕垂直居中，无论滑动) */}
+        <aside class="hidden lg:block w-full h-full relative select-none">
+          <div class="sticky top-0 h-[calc(100vh-5.75rem)] flex flex-col justify-center pointer-events-none">
+            <div class="pointer-events-auto w-full">
+              <TableOfContents headings={headings} locale={postLocale} client:load />
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  {/* 代码块顶栏语言标识与复制功能客户端增强 */}
+  <script is:inline>
+    (function () {
+      function formatLang(rawLang) {
+        if (!rawLang) return 'code';
+        const key = rawLang.toLowerCase().trim();
+        const aliasMap = {
+          js: 'javascript',
+          ts: 'typescript',
+          py: 'python',
+          sh: 'bash',
+          yml: 'yaml',
+          md: 'markdown',
+          rs: 'rust',
+          golang: 'go',
+        };
+        return aliasMap[key] || key;
+      }
+
+      function setupCodeBlocks() {
+        const codeBlocks = document.querySelectorAll('.markdown-content pre:not([data-enhanced="true"])');
+        if (!codeBlocks || codeBlocks.length === 0) return;
+
+        codeBlocks.forEach(function (pre) {
+          pre.setAttribute('data-enhanced', 'true');
+
+          // 提取语言
+          let lang = pre.getAttribute('data-language') || '';
+          if (!lang) {
+            const match = pre.className.match(/language-([a-zA-Z0-9_-]+)/);
+            if (match) lang = match[1];
+          }
+          const displayLang = formatLang(lang);
+
+          // 创建包裹容器
+          const wrapper = document.createElement('div');
+          wrapper.className = 'code-block-wrapper';
+
+          // 创建顶栏 (Header Bar: 左侧代码类型，右侧复制按钮)
+          const header = document.createElement('div');
+          header.className = 'code-block-header';
+
+          // 左侧代码语言类型
+          const langLabel = document.createElement('span');
+          langLabel.className = 'code-lang-label';
+          langLabel.textContent = displayLang;
+
+          // 右侧复制按钮与国际化标签
+          const isEn = document.documentElement.lang?.startsWith('en') || window.location.pathname.includes('/en_us/');
+          const copyLabel = isEn ? 'Copy' : '复制';
+          const copiedLabel = isEn ? 'Copied' : '已复制';
+
+          const copyBtn = document.createElement('button');
+          copyBtn.type = 'button';
+          copyBtn.className = 'code-copy-btn';
+          copyBtn.setAttribute('aria-label', copyLabel);
+          copyBtn.setAttribute('title', copyLabel);
+
+          const copySvg = '<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+          const checkSvg = '<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+          copyBtn.innerHTML = copySvg + '<span class="copy-text">' + copyLabel + '</span>';
+
+          header.appendChild(langLabel);
+          header.appendChild(copyBtn);
+
+          // 插入 wrapper 并将 header 与 pre 移入
+          if (pre.parentNode) {
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(header);
+            wrapper.appendChild(pre);
+          }
+
+          // 复制事件处理 (使用 .line textContent 提取，确保纯净代码，绝不复制行号)
+          let resetTimer = null;
+          copyBtn.addEventListener('click', async function () {
+            const lineEls = pre.querySelectorAll('.line');
+            let codeText = '';
+            if (lineEls.length > 0) {
+              codeText = Array.from(lineEls).map(function (l) { return l.textContent; }).join('\n');
+            } else {
+              const codeEl = pre.querySelector('code');
+              codeText = codeEl ? codeEl.textContent : (pre.textContent || '');
+            }
+
+            let copied = false;
+            if (navigator.clipboard && window.isSecureContext) {
+              try {
+                await navigator.clipboard.writeText(codeText);
+                copied = true;
+              } catch (clipErr) {}
+            }
+
+            if (!copied) {
+              try {
+                const textarea = document.createElement('textarea');
+                textarea.value = codeText;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                textarea.style.top = '-9999px';
+                textarea.setAttribute('readonly', '');
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                document['execCommand']('copy');
+                document.body.removeChild(textarea);
+              } catch (execErr) {}
+            }
+
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = checkSvg + '<span class="copy-text text-emerald-400 font-medium">' + copiedLabel + '</span>';
+
+            if (resetTimer) clearTimeout(resetTimer);
+            resetTimer = setTimeout(function () {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = copySvg + '<span class="copy-text">' + copyLabel + '</span>';
+            }, 2000);
+          });
+        });
+      }
+
+      if (!window.__codeBlocksSetupRegistered) {
+        window.__codeBlocksSetupRegistered = true;
+        document.addEventListener('astro:page-load', setupCodeBlocks);
+      }
+      setupCodeBlocks();
+    })();
+  </script>
+</BaseLayout>
