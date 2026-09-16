@@ -142,6 +142,40 @@
    - **表格系统**：`.markdown-content table` 移除外层 `1rem` 圆角，转为纯平直角亚克力网格；
    - **行内元素与引用**：行内代码徽章（`code`）、块引用（`blockquote`）、图片（`img`）等全部取消圆角，达成极度统一的严谨技术读物美感。
 
+
+### 1.8 KaTeX LaTeX 数学公式渲染系统 (KaTeX Pipeline & Frosted Math Cards)
+为了给学术研究、算法推导及深度学习工程博客提供顶级的公式排版呈现，正文排版引擎全量集成了基于 **KaTeX** 的编译与样式管线：
+1. **Unified Remark / Rehype 编译管道集成**：
+   - 在 `astro.config.mjs` 中使用 `@astrojs/markdown-remark` 导出的 `unified` 处理器：
+     ```javascript
+     markdown: {
+       processor: unified({
+         remarkPlugins: [remarkMath],
+         rehypePlugins: [rehypeKatex],
+       }),
+     }
+     ```
+   - 静态预编译阶段将 Markdown 中的 `$inline$` 与 `$$block$$` 转化为标准 MathML 与紧凑的高性能 HTML，实现客户端 0 JS 纯静态数学渲染。
+2. **高对比度行内公式排版**：
+   - 行内公式（`span.katex`）应用高对比深色字体（`color: #0f172a; font-size: 1.05em;`），字符边缘采用 `text-rendering: geometricPrecision` 渲染；
+   - 微积分微分算子、上标、下标与希腊字母严格贴合基线，绝不因行高截断。
+3. **块级公式微卡片与平滑横向滚动架构 (`.katex-display`)**：
+   - 容器样式与磨砂玻璃系统深度融合：`background-color: rgba(255, 255, 255, 0.2)`、`border: 1px solid rgba(255, 255, 255, 0.45)`、`backdrop-filter: blur(8px)`、`box-shadow: 0 6px 24px -8px rgba(0, 0, 0, 0.08)`；
+   - **横向自适应溢出安全机制**：在移动端或公式宽度超出主阅读区时，应用 `overflow-x: auto; overflow-y: hidden;`，并定制极简 4px 平滑滚动条（`.katex-display::-webkit-scrollbar`），杜绝公式撑破卡片或折行错位；
+   - 严格遵循全 0 圆角工坊铁律（`border-radius: 0 !important;`）。
+
+### 1.9 Markdown 正文图片微卡片与剧院级全屏灯箱 (Article Image & Theater Lightbox)
+技术文章中的架构拓扑图、流程图与代码执行图需要细腻的展示与全分辨率查阅能力：
+1. **正文图片微卡片与工整图注生成**：
+   - 图片默认居中渲染，配备白透微边框与立体软阴影（`border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.14)`），鼠标悬浮微放大（`hover:scale-[1.008]`）并呈现放大镜光标（`cursor: zoom-in`）；
+   - **自动等宽图注（Auto Caption）**：客户端脚本扫描 `.markdown-content img`，若存在 `alt` 描述且父容器未包含图注，则自动生成工整居中的等宽图注标签（`<figcaption class="image-caption">`，`font-mono text-xs text-neutral-600`）；
+   - 强制直角无圆角（`border-radius: 0 !important;`）。
+2. **剧院级大图灯箱架构 (Theater-Scale Frosted Lightbox)**：
+   - **直挂 Body 突破包含块**：当读者点击正文任意图片时，动态将灯箱挂载至 `document.body`，彻底规避卡片 `backdrop-filter` 与 `overflow: hidden` 的视口陷阱；
+   - **剧院级尺寸与晶透玻璃质感**：`w-[96vw] max-w-[1380px] h-[92vh] sm:h-[94vh]`、`bg-white/45 backdrop-blur-3xl backdrop-saturate-150`、顶层 1px 镜面反光高光（`bg-gradient-to-r from-transparent via-white/90 to-transparent`）；
+   - **无横线顶栏与中央胶囊**：顶栏不设硬边分割线，正中常驻等宽页码与图注胶囊（如 `1 / 3 · 系统核心分层架构`），右侧设置白玉圆形关闭按钮；
+   - **键盘导航与手势支持**：`Escape` 一键关闭、`ArrowLeft` / `ArrowRight` 顺滑切图、点击外层半透遮罩平滑退出；
+   - **滚动锁定与路由生命周期安全**：开启时锁定 `document.body.style.overflow = 'hidden'`，关闭或触发 Astro `astro:before-swap` 转场时自动恢复视口滚动并完全释放 DOM 节点。
 ---
 
 ## 2. 踩坑点与 Bug 修复记录
@@ -264,6 +298,21 @@
   4. 彻底消除任何容易造成多重叠加的内部 `padding-top`，通过外层 `pointer-events-none` 与卡片 `pointer-events-auto` 杜绝空白区域阻碍事件点击；
   5. 自动化测试实测从 `scrollTop = 0` 到长文深入 `scrollTop = 1500px`，目录卡片在视口中的屏幕 Y 轴绝对坐标恒为 `top: 248px, bottom: 768px`，达成真正的“**无论滚动与否，永远绝对居中**”。
 
+
+### 坑 13：Astro 7 默认切换 Sätteri 导致 Legacy Markdown 插件报错与统一处理器 (unified) 迁移
+- **现象**：在 `astro.config.mjs` 中直接配置 `markdown.remarkPlugins` 与 `markdown.rehypePlugins` 时，控制台抛出硬错误或警告：`@astrojs/markdown-remark is no longer installed by default now that Sätteri is the default Markdown processor`。
+- **原因**：Astro 7 将底层默认 Markdown 引擎切换为 Sätteri，原本内置的 Unified 插件管线需要显式引入独立包 `@astrojs/markdown-remark`。
+- **修复**：
+  1. 安装 `@astrojs/markdown-remark`、`remark-math`、`rehype-katex` 与 `katex`；
+  2. 在 `astro.config.mjs` 中改用推荐的 `markdown: { processor: unified({ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] }) }`；
+  3. 在 `src/styles/global.css` 中引入 `katex/dist/katex.min.css`，由 Vite 自动打包分发全套 KaTeX woff/woff2 矢量字体。
+
+### 坑 14：Markdown 正文图片与大图悬浮窗在包含块与页面跳转下的生命周期控制
+- **现象**：如果将图片预览模态框挂载在文章详情卡片内，在遇到卡片的 `backdrop-filter` 与 `overflow-hidden` 时，模态框会被强制限制在卡片内部（甚至无法居中撑满全屏）；此外若在全屏灯箱打开状态下点击浏览器返回键，视口滚动可能永久被锁死在 `overflow: hidden`。
+- **原因**：CSS 规范中包含块（Containing Block）对 `position: fixed` 的劫持；以及单页路由（ClientRouter）转场离开未清理内联样式副作用。
+- **修复**：
+  1. 模态框统一动态挂载至 `document.body`；
+  2. 注册 `astro:before-swap` 生命周期钩子，在页面切换前自动执行 `closeArticleLightbox()` 恢复 `document.body.style.overflow` 并完全清理 DOM 节点与键盘事件监听器，实现 100% 内存无泄漏与零残余样式。
 
 
 

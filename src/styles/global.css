@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Outfit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@700;800&family=Quicksand:wght@700&display=swap');
+@import 'katex/dist/katex.min.css';
 
 @tailwind base;
 @tailwind components;
@@ -542,11 +543,103 @@
   color: #0f172a;
 }
 
-/* 正文图片 (零圆角) */
+/* 正文图片与图注系统 (零圆角 + 晶透微边框) */
+.markdown-content figure {
+  margin: 2.25rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.markdown-content .markdown-image-wrapper {
+  margin: 2.25rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .markdown-content img {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   border-radius: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.14);
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: zoom-in;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease;
+}
+
+.markdown-content img:hover {
+  transform: scale(1.008);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.22);
+  border-color: rgba(255, 255, 255, 0.95);
+}
+
+.markdown-content figcaption,
+.markdown-content .image-caption {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #4b5563;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  text-align: center;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+/* LaTeX 数学公式渲染系统 (KaTeX) */
+.markdown-content .katex {
+  color: #0f172a;
+  font-size: 1.05em;
+  text-rendering: geometricPrecision;
+}
+
+/* 块级数学公式卡片 (Display Math - 晶透磨砂微卡片 + 横向平滑溢出滚动) */
+.markdown-content .katex-display {
+  margin: 1.75rem 0 !important;
+  padding: 1.25rem 1.75rem !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100% !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 6px 24px -8px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  text-align: center !important;
+  border-radius: 0 !important;
+}
+
+.markdown-content .katex-display::-webkit-scrollbar {
+  height: 4px;
+}
+
+.markdown-content .katex-display::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdown-content .katex-display::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0 !important;
+}
+
+.markdown-content .katex-display::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.markdown-content .katex-display > .katex {
+  display: inline-block;
+  min-width: min-content;
+  text-align: center;
 }
 
 /* 分割线 */

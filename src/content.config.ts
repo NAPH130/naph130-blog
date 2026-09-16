@@ -39,4 +39,19 @@ const moments = defineCollection({
   }),
 });
 
-export const collections = { posts, moments };
+const friends = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/friends' }),
+  schema: z.object({
+    id: z.string().optional(),
+    title: z.string().optional(),
+    name: z.string().optional(),
+    avatar: z.string().default(''),
+    description: z.string().default(''),
+    bio: z.string().default(''),
+    url: z.string(),
+    tags: z.array(z.string()).default([]),
+    category: z.string().optional(),
+  }),
+});
+
+export const collections = { posts, moments, friends };

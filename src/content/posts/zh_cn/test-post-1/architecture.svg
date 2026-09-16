@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="card-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.12)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0.03)" />
+    </linearGradient>
+    <linearGradient id="accent-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <linearGradient id="accent-emerald" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bg-grad)" />
+  <rect x="20" y="20" width="760" height="360" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+
+  <!-- Title -->
+  <text x="50" y="65" fill="#f8fafc" font-family="'Comfortaa', sans-serif" font-size="20" font-weight="bold">System Layered Architecture &amp; Data Pipeline</text>
+  <text x="50" y="90" fill="#94a3b8" font-family="monospace" font-size="12">Decoupled SSG + Astro Client Islands + Frosted Glass Layer</text>
+
+  <!-- Layer 1: Client Browser -->
+  <rect x="50" y="130" width="200" height="210" fill="url(#card-grad)" stroke="rgba(56,189,248,0.4)" stroke-width="1.5" />
+  <text x="70" y="165" fill="#38bdf8" font-family="sans-serif" font-size="14" font-weight="bold">Client View Layer</text>
+  <rect x="70" y="185" width="160" height="36" fill="rgba(56,189,248,0.1)" stroke="#38bdf8" stroke-width="1" />
+  <text x="85" y="208" fill="#e2e8f0" font-family="monospace" font-size="11">HeaderNav (50vw Center)</text>
+  <rect x="70" y="235" width="160" height="36" fill="rgba(56,189,248,0.1)" stroke="#38bdf8" stroke-width="1" />
+  <text x="85" y="258" fill="#e2e8f0" font-family="monospace" font-size="11">PostDetail &amp; Sticky TOC</text>
+  <rect x="70" y="285" width="160" height="36" fill="rgba(56,189,248,0.1)" stroke="#38bdf8" stroke-width="1" />
+  <text x="85" y="308" fill="#e2e8f0" font-family="monospace" font-size="11">Theater Image Lightbox</text>
+
+  <!-- Flow Arrows 1 -> 2 -->
+  <path d="M 260 235 L 300 235" fill="none" stroke="url(#accent-blue)" stroke-width="2.5" marker-end="url(#arrow)" />
+  <polygon points="305,235 295,230 295,240" fill="#818cf8" />
+
+  <!-- Layer 2: Core State & SSOT -->
+  <rect x="310" y="130" width="200" height="210" fill="url(#card-grad)" stroke="rgba(129,140,248,0.4)" stroke-width="1.5" />
+  <text x="330" y="165" fill="#818cf8" font-family="sans-serif" font-size="14" font-weight="bold">SSOT &amp; Utilities</text>
+  <rect x="330" y="185" width="160" height="36" fill="rgba(129,140,248,0.1)" stroke="#818cf8" stroke-width="1" />
+  <text x="345" y="208" fill="#e2e8f0" font-family="monospace" font-size="11">frostedGlass.ts (SSOT)</text>
+  <rect x="330" y="235" width="160" height="36" fill="rgba(129,140,248,0.1)" stroke="#818cf8" stroke-width="1" />
+  <text x="345" y="258" fill="#e2e8f0" font-family="monospace" font-size="11">KaTeX MathML Pipeline</text>
+  <rect x="330" y="285" width="160" height="36" fill="rgba(129,140,248,0.1)" stroke="#818cf8" stroke-width="1" />
+  <text x="345" y="308" fill="#e2e8f0" font-family="monospace" font-size="11">Image Optimization</text>
+
+  <!-- Flow Arrows 2 -> 3 -->
+  <path d="M 520 235 L 560 235" fill="none" stroke="url(#accent-emerald)" stroke-width="2.5" />
+  <polygon points="565,235 555,230 555,240" fill="#34d399" />
+
+  <!-- Layer 3: Content Layer & Build -->
+  <rect x="570" y="130" width="180" height="210" fill="url(#card-grad)" stroke="rgba(52,211,153,0.4)" stroke-width="1.5" />
+  <text x="590" y="165" fill="#34d399" font-family="sans-serif" font-size="14" font-weight="bold">Static Content Layer</text>
+  <rect x="590" y="185" width="140" height="36" fill="rgba(52,211,153,0.1)" stroke="#34d399" stroke-width="1" />
+  <text x="605" y="208" fill="#e2e8f0" font-family="monospace" font-size="11">src/content/posts</text>
+  <rect x="590" y="235" width="140" height="36" fill="rgba(52,211,153,0.1)" stroke="#34d399" stroke-width="1" />
+  <text x="605" y="258" fill="#e2e8f0" font-family="monospace" font-size="11">Vite Asset Glob</text>
+  <rect x="590" y="285" width="140" height="36" fill="rgba(52,211,153,0.1)" stroke="#34d399" stroke-width="1" />
+  <text x="605" y="308" fill="#e2e8f0" font-family="monospace" font-size="11">SSG HTML Output</text>
+</svg>

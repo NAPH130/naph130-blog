@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>友链页创新交互设计原型 (3大概念方案) - NAPH130's Blog</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            comfortaa: ['Comfortaa', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #070b14;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    /* 极简磨砂滚动条 */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.45); }
+
+    /* 深空环境光晕底图 */
+    .space-bg {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(at 20% 25%, rgba(56, 189, 248, 0.25) 0px, transparent 55%),
+        radial-gradient(at 80% 15%, rgba(129, 140, 248, 0.22) 0px, transparent 50%),
+        radial-gradient(at 50% 85%, rgba(244, 63, 94, 0.18) 0px, transparent 60%),
+        radial-gradient(at 85% 85%, rgba(52, 211, 153, 0.16) 0px, transparent 50%),
+        linear-gradient(135deg, #070b14 0%, #0d1527 50%, #080c16 100%);
+      background-size: cover;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .frosted-overlay {
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(35px) saturate(150%);
+      -webkit-backdrop-filter: blur(35px) saturate(150%);
+      background-color: rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 晶透磨砂卡片标准 */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(28px) saturate(170%);
+      -webkit-backdrop-filter: blur(28px) saturate(170%);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.4), inset 0 1px 1.5px rgba(255, 255, 255, 0.7);
+    }
+
+    .glass-hud {
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* 3D 棱镜切片透光卡片 */
+    .prism-card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.35);
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .prism-card:hover {
+      border-color: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 24px 60px -15px rgba(56, 189, 248, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+
+    /* 星轨节点动画 */
+    @keyframes orbit-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring-anim {
+      animation: pulse-ring 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="relative min-h-screen selection:bg-sky-500 selection:text-white">
+
+  <div class="space-bg"></div>
+  <div class="frosted-overlay"></div>
+
+  <!-- 主应用视口 -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+
+    <!-- 顶部导航控制台：3 大创新概念切换器 -->
+    <header class="sticky top-0 z-50 w-full px-4 sm:px-8 py-3.5 bg-neutral-950/40 backdrop-blur-2xl border-b border-white/20 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="/" class="font-comfortaa font-bold text-lg tracking-tight text-white flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]"></span>
+          NAPH130
+        </a>
+        <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/10 border border-white/20 text-neutral-300">
+          友链创新概念实验室
+        </span>
+      </div>
+
+      <!-- 3 大创新方案切换 Tab -->
+      <div class="flex items-center gap-1.5 p-1 rounded-full bg-black/40 border border-white/20 shadow-inner">
+        <button
+          id="tab-btn-1"
+          onclick="selectConcept(1)"
+          class="concept-tab-btn px-4 py-1.5 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 bg-sky-500 text-white shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+        >
+          概念 1：天体引力场与星轨雷达
+        </button>
+        <button
+          id="tab-btn-2"
+          onclick="selectConcept(2)"
+          class="concept-tab-btn px-4 py-1.5 rounded-full font-medium text-xs sm:text-sm text-neutral-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+        >
+          概念 2：射电望远镜频谱侦测站
+        </button>
+        <button
+          id="tab-btn-3"
+          onclick="selectConcept(3)"
+          class="concept-tab-btn px-4 py-1.5 rounded-full font-medium text-xs sm:text-sm text-neutral-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+        >
+          概念 3：3D 晶体透镜切片舱
+        </button>
+      </div>
+
+      <div class="hidden xl:flex items-center gap-2 text-xs font-mono text-neutral-400">
+        <span id="concept-summary">概念 1: 物理力场、轨道微谐波、粒子连线与透镜雷达</span>
+      </div>
+    </header>
+
+
+    <!-- =================================================================== -->
+    <!-- 概念 1：天体引力场与星轨雷达 (Celestial Gravity & Orbital Radar)       -->
+    <!-- 理念：你不再看一个个规整的方块列表，而是置身于数字星系的轨道引力场中。 -->
+    <!-- =================================================================== -->
+    <section id="concept-view-1" class="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center my-auto">
+      
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden min-h-[680px] flex flex-col justify-between">
+        
+        <!-- 顶栏信息与模式切换 -->
+        <div class="relative z-20 flex flex-wrap items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-3">
+              <h2 class="font-comfortaa font-bold text-2xl sm:text-3xl text-white tracking-tight flex items-center gap-2.5">
+                星野引力场
+                <span class="text-xs font-mono font-normal px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                  Orbital Gravity Field
+                </span>
+              </h2>
+            </div>
+            <p class="text-xs font-mono text-neutral-300">
+              各站点如同环绕运行的独立星体。移动鼠标施加引力摄动，悬停行星唤起高能谱线探测。
+            </p>
+          </div>
+
+          <!-- 右侧雷达遥测数据与快捷交换 -->
+          <div class="flex items-center gap-2">
+            <button
+              onclick="copyExchangeData()"
+              class="glass-hud px-3.5 py-1.5 rounded-xl text-xs font-mono text-neutral-200 hover:text-white hover:bg-white/20 border border-white/30 flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              广播本站信标 (Copy Link Info)
+            </button>
+          </div>
+        </div>
+
+        <!-- 中部核心：Canvas 天体轨道与引力粒子引擎 -->
+        <div class="relative flex-1 w-full h-[520px] my-2 overflow-hidden flex items-center justify-center select-none" id="radar-viewport">
+          <!-- 背景粒子与引力射线 Canvas -->
+          <canvas id="orbit-canvas" class="absolute inset-0 w-full h-full pointer-events-auto cursor-crosshair"></canvas>
+
+          <!-- 悬浮行星节点 (通过绝对定位与 Canvas 实时同步，具备真实 DOM 交互与超清无损头像) -->
+          <div id="planets-layer" class="absolute inset-0 pointer-events-none">
+            <!-- 动态生成行星 DOM -->
+          </div>
+
+          <!-- 悬浮侦测探针卡片 (Telemetry HUD) -->
+          <div
+            id="planet-hud"
+            class="absolute pointer-events-auto transition-all duration-300 opacity-0 scale-95 translate-y-2 glass-hud rounded-2xl p-4 w-72 border border-white/40 shadow-2xl z-30 pointer-events-none"
+          >
+            <div class="flex items-center gap-3 pb-2.5 border-b border-white/20">
+              <img id="hud-avatar" src="" alt="" class="w-10 h-10 rounded-xl object-cover border border-white/60 bg-white/10" />
+              <div class="min-w-0 flex-1">
+                <div id="hud-name" class="font-comfortaa font-bold text-sm text-white truncate">--</div>
+                <div id="hud-orbit" class="text-[10.5px] font-mono text-sky-300 truncate">--</div>
+              </div>
+            </div>
+            <p id="hud-bio" class="text-xs text-neutral-200 mt-2.5 leading-relaxed">--</p>
+            <div id="hud-tags" class="flex flex-wrap gap-1 mt-3"></div>
+            <a
+              id="hud-link"
+              href="#"
+              target="_blank"
+              class="mt-3 w-full py-1.5 px-3 rounded-lg bg-sky-500/80 hover:bg-sky-400 text-white font-mono text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+            >
+              建立超空间跃迁 (Visit)
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- 底部轨道波段图例 -->
+        <div class="relative z-20 pt-3 border-t border-white/20 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-neutral-400">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full border border-sky-400"></span> 内轨: 核心极客 (Tech)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full border border-indigo-400"></span> 中轨: 算法前沿 (Algorithms)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full border border-emerald-400"></span> 外轨: 生活光影 (Life)</span>
+          </div>
+          <div class="text-neutral-400 text-[11px]">
+            拖拽视口以改变引力摄动 · 双击任意天体锁定聚焦
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =================================================================== -->
+    <!-- 概念 2：射电望远镜频谱侦测站 (Cybernetic Radio Telescope & Oscilloscope) -->
+    <!-- 理念：完全遵循工坊 Raw 美学，将友链抽象为不同频率的射电广播频道。    -->
+    <!-- =================================================================== -->
+    <section id="concept-view-2" class="hidden flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center my-auto animate-in fade-in duration-300">
+      
+      <div class="glass-panel rounded-none p-6 sm:p-8 relative min-h-[680px] flex flex-col gap-6">
+        
+        <!-- 终端顶栏仪表 -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/20">
+          <div class="space-y-1">
+            <div class="flex items-center gap-3">
+              <span class="w-3 h-3 bg-emerald-400 shadow-[0_0_12px_#34d399]"></span>
+              <h2 class="font-mono font-bold text-2xl text-white tracking-wider">
+                DEEP-SPACE RADIO TELEMETRY [友邻频谱侦测站]
+              </h2>
+            </div>
+            <p class="text-xs font-mono text-neutral-300">
+              RX TUNER: 1420.405 MHz · HYDROGEN LINE · 8 CHANNELS DETECTED
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 font-mono text-xs">
+            <span class="text-neutral-400">STATUS: <span class="text-emerald-400 font-bold">SIGNAL LOCKED</span></span>
+            <span class="text-neutral-400">BAND: <span class="text-sky-400">KU-BAND</span></span>
+          </div>
+        </div>
+
+        <!-- 示波器波形模拟显示屏 (Oscilloscope Canvas) -->
+        <div class="relative w-full h-36 bg-black/60 border border-emerald-500/40 overflow-hidden flex flex-col justify-between p-3">
+          <div class="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+          <canvas id="scope-canvas" class="w-full h-full relative z-10"></canvas>
+          <div class="absolute bottom-2 right-3 font-mono text-[10px] text-emerald-400/80 pointer-events-none">
+            FREQUENCY PHASE RESOLVER v2.4 · 60 FPS SYNC
+          </div>
+        </div>
+
+        <!-- 频道调频选择器与高精度解码 HUD (双栏工坊布局) -->
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 flex-1 items-stretch">
+          
+          <!-- 左侧：频道调谐面板 (Channel Selector Deck) -->
+          <div class="space-y-2 overflow-y-auto max-h-[340px] pr-2">
+            <div id="channel-list" class="space-y-2">
+              <!-- 动态生成频率调谐条目 -->
+            </div>
+          </div>
+
+          <!-- 右侧：当前频率信号锁定解调器 (Signal Receiver HUD) -->
+          <div class="glass-hud rounded-none p-5 flex flex-col justify-between border border-white/30">
+            <div>
+              <div class="flex items-center justify-between text-xs font-mono text-neutral-400 pb-3 border-b border-white/20">
+                <span>DEMODULATOR: QAM-256</span>
+                <span id="radio-snr" class="text-emerald-400 font-bold">SNR: +24.8 dB</span>
+              </div>
+
+              <!-- 调谐头像与详情 -->
+              <div class="flex items-center gap-4 mt-4">
+                <div class="w-14 h-14 rounded-none border border-white/50 bg-black/40 overflow-hidden shrink-0">
+                  <img id="radio-avatar" src="" alt="" class="w-full h-full object-cover" />
+                </div>
+                <div class="min-w-0">
+                  <h3 id="radio-name" class="font-mono font-bold text-base text-white truncate">--</h3>
+                  <div id="radio-freq" class="text-xs font-mono text-sky-400">FREQ: -- MHz</div>
+                  <div id="radio-tags" class="flex flex-wrap gap-1 mt-1"></div>
+                </div>
+              </div>
+
+              <div class="mt-4 p-3 bg-black/40 border border-white/15 text-xs font-mono text-neutral-200 leading-relaxed min-h-[70px]" id="radio-bio">
+                --
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-white/20 space-y-2">
+              <a
+                id="radio-url-btn"
+                href="#"
+                target="_blank"
+                class="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                ACCESS DIRECT TRANSMISSION [直达站点]
+              </a>
+              <button
+                onclick="copyExchangeData()"
+                class="w-full py-1.5 bg-white/10 hover:bg-white/20 text-white font-mono text-xs flex items-center justify-center gap-2 border border-white/30 cursor-pointer"
+              >
+                BROADCAST MY METRICS [复制本站电台参数]
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =================================================================== -->
+    <!-- 概念 3：3D 晶体透镜切片舱 (Isometric 3D Prismatic Acrylic Deck)         -->
+    <!-- 理念：将 SSOT 磨砂玻璃推至极致，每张卡片如同带有真实鼠标 3D 俯仰的透光切片。 -->
+    <!-- =================================================================== -->
+    <section id="concept-view-3" class="hidden flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center my-auto animate-in fade-in duration-300">
+      
+      <div class="glass-panel rounded-3xl p-6 sm:p-10 flex flex-col gap-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/20">
+          <div class="space-y-1">
+            <h2 class="font-comfortaa font-bold text-3xl text-white tracking-tight flex items-center gap-2.5">
+              晶体折射舱
+              <span class="text-xs font-mono font-normal px-2.5 py-0.5 rounded-full bg-white/15 text-neutral-200 border border-white/30">
+                3D Prismatic Deck
+              </span>
+            </h2>
+            <p class="text-xs text-neutral-300 font-sans">
+              鼠标移动实时激发 3D 空间透视扭曲与镜面色散高光。点击直达，右键快速提取信息。
+            </p>
+          </div>
+
+          <!-- 分类筛选小胶囊 -->
+          <div class="flex items-center gap-1.5 p-1 rounded-full bg-white/10 border border-white/25 text-xs">
+            <button onclick="filterPrism('all')" class="prism-cat px-3 py-1 rounded-full bg-white text-neutral-900 font-semibold transition-all">全部</button>
+            <button onclick="filterPrism('tech')" class="prism-cat px-3 py-1 rounded-full text-neutral-300 hover:text-white transition-all">极客技术</button>
+            <button onclick="filterPrism('algorithm')" class="prism-cat px-3 py-1 rounded-full text-neutral-300 hover:text-white transition-all">算法世界</button>
+            <button onclick="filterPrism('life')" class="prism-cat px-3 py-1 rounded-full text-neutral-300 hover:text-white transition-all">生活美学</button>
+          </div>
+        </div>
+
+        <!-- 3D 棱镜卡片网格 -->
+        <div id="prism-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 perspective-[1200px] py-4">
+          <!-- 动态渲染 3D 棱镜卡片 -->
+        </div>
+
+        <!-- 底部一键复制栏 -->
+        <div class="p-4 rounded-2xl bg-white/10 border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-neutral-300">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span>NAPH130's Blog · https://naph130.top · 探索现代前端工程与物理建模</span>
+          </div>
+          <button onclick="copyExchangeData()" class="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/40 text-white font-semibold transition-all cursor-pointer">
+            一键复制本站数据
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 底部反馈吐司 (Toast) -->
+    <div id="toast" class="fixed bottom-6 right-6 z-[9999] px-4 py-2.5 rounded-xl bg-neutral-900/90 border border-white/20 backdrop-blur-xl text-white text-xs font-mono shadow-2xl flex items-center gap-2 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+      <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+      <span id="toast-text">已复制本站信标信息到剪贴板！</span>
+    </div>
+
+  </div>
+
+  <!-- 创新交互核心驱动脚本 -->
+  <script>
+    // 基础友链数据集
+    const FRIENDS = [
+      {
+        id: 'antigravity',
+        name: 'Antigravity',
+        url: 'https://example.com/antigravity',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        bio: '探索现代前端工程架构、离散数学流形与物理建模。',
+        category: 'tech',
+        freq: '1420.405',
+        orbit: 'Inner (Tech)',
+        radius: 120,
+        speed: 0.008,
+        angle: 0.2,
+        color: '#38bdf8',
+        tags: ['Astro', 'React', 'Math']
+      },
+      {
+        id: 'sukka',
+        name: 'Sukka\'s Lab',
+        url: 'https://example.com/sukka',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        bio: '专注于 Web 性能调优、DNS 基础设施与开源生态实践。',
+        category: 'tech',
+        freq: '1428.112',
+        orbit: 'Inner (Tech)',
+        radius: 140,
+        speed: 0.006,
+        angle: 1.8,
+        color: '#38bdf8',
+        tags: ['Performance', 'Network']
+      },
+      {
+        id: 'anthony-fu',
+        name: 'Anthony Fu',
+        url: 'https://example.com/antfu',
+        avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
+        bio: 'Vue / Vite / Nuxt 核心维护者，极速开源构建工具探索者。',
+        category: 'tech',
+        freq: '1435.880',
+        orbit: 'Inner (Tech)',
+        radius: 160,
+        speed: -0.007,
+        angle: 3.4,
+        color: '#38bdf8',
+        tags: ['Vue', 'Vite', 'TS']
+      },
+      {
+        id: 'tourist',
+        name: 'Gennady (tourist)',
+        url: 'https://example.com/tourist',
+        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+        bio: 'ACM/ICPC World Finals 传奇冠军，算法竞赛天花板。',
+        category: 'algorithm',
+        freq: '2400.000',
+        orbit: 'Middle (Algo)',
+        radius: 200,
+        speed: 0.004,
+        angle: 0.9,
+        color: '#818cf8',
+        tags: ['Algorithms', 'Codeforces']
+      },
+      {
+        id: 'cp-master',
+        name: 'AlgoVoyage',
+        url: 'https://example.com/algovoyage',
+        avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+        bio: '图论、组合数学、计算几何与动态规划题解专题库。',
+        category: 'algorithm',
+        freq: '2412.550',
+        orbit: 'Middle (Algo)',
+        radius: 220,
+        speed: -0.005,
+        angle: 2.7,
+        color: '#818cf8',
+        tags: ['C++', 'GraphTheory']
+      },
+      {
+        id: 'diygod',
+        name: 'DIYgod',
+        url: 'https://example.com/diygod',
+        avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
+        bio: '创造有爱的事物。RSSHub & Follow 独立开发者。',
+        category: 'tech',
+        freq: '1442.200',
+        orbit: 'Inner (Tech)',
+        radius: 175,
+        speed: 0.005,
+        angle: 5.1,
+        color: '#38bdf8',
+        tags: ['RSS', 'Node.js']
+      },
+      {
+        id: 'lao-qi',
+        name: '光影日记 (Lao Qi)',
+        url: 'https://example.com/film',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+        bio: '记录中画幅胶片色彩、城市建筑漫游与光影美学。',
+        category: 'life',
+        freq: '5180.000',
+        orbit: 'Outer (Life)',
+        radius: 260,
+        speed: 0.003,
+        angle: 4.1,
+        color: '#34d399',
+        tags: ['Photography', 'Film']
+      },
+      {
+        id: 'cat-in-box',
+        name: '数字荒原漫游者',
+        url: 'https://example.com/wasteland',
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        bio: '在现代互联网迷宫中收集灵感碎片的观察者。',
+        category: 'life',
+        freq: '5220.500',
+        orbit: 'Outer (Life)',
+        radius: 275,
+        speed: -0.003,
+        angle: 1.3,
+        color: '#34d399',
+        tags: ['Design', 'Essay']
+      }
+    ];
+
+    // ==========================================
+    // 方案切换管理器
+    // ==========================================
+    function selectConcept(id) {
+      document.querySelectorAll('.concept-tab-btn').forEach(btn => {
+        btn.className = 'concept-tab-btn px-4 py-1.5 rounded-full font-medium text-xs sm:text-sm text-neutral-300 hover:text-white hover:bg-white/10 transition-all duration-200';
+      });
+      const activeBtn = document.getElementById(`tab-btn-${id}`);
+      activeBtn.className = 'concept-tab-btn px-4 py-1.5 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 bg-sky-500 text-white shadow-[0_0_15px_rgba(56,189,248,0.5)]';
+
+      document.getElementById('concept-view-1').classList.add('hidden');
+      document.getElementById('concept-view-2').classList.add('hidden');
+      document.getElementById('concept-view-3').classList.add('hidden');
+      document.getElementById(`concept-view-${id}`).classList.remove('hidden');
+
+      const sum = document.getElementById('concept-summary');
+      if (id === 1) sum.textContent = '概念 1: 物理力场、轨道微谐波、粒子连线与透镜雷达';
+      if (id === 2) sum.textContent = '概念 2: 极客频谱波形示波器、频率调谐信道与信号解码';
+      if (id === 3) sum.textContent = '概念 3: 3D 鼠标物理倾斜切片、镜面高光反射与色散';
+
+      if (id === 2) startOscilloscope();
+    }
+
+    // ==========================================
+    // 概念 1：星轨引力场与雷达 Canvas 引擎
+    // ==========================================
+    const canvas = document.getElementById('orbit-canvas');
+    const ctx = canvas.getContext('2d');
+    const planetsLayer = document.getElementById('planets-layer');
+    const hud = document.getElementById('planet-hud');
+
+    let mouseX = 0, mouseY = 0, isHovering = false;
+    let width = 0, height = 0;
+    let activePlanet = null;
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // 初始化天体 DOM 元素
+    FRIENDS.forEach((f, idx) => {
+      const el = document.createElement('div');
+      el.id = `planet-${f.id}`;
+      el.className = 'absolute w-12 h-12 -ml-6 -mt-6 rounded-full cursor-pointer pointer-events-auto transition-transform duration-150 hover:scale-125 flex items-center justify-center';
+      el.innerHTML = `
+        <div class="relative w-full h-full rounded-full p-0.5 border border-white/60 bg-white/20 backdrop-blur-md shadow-[0_0_15px_${f.color}] overflow-hidden">
+          <img src="${f.avatar}" alt="${f.name}" class="w-full h-full rounded-full object-cover" />
+        </div>
+        <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 font-mono text-[10px] text-white/90 whitespace-nowrap bg-black/60 px-1.5 py-0.2 rounded border border-white/20">
+          ${f.name}
+        </div>
+      `;
+      el.addEventListener('mouseenter', (e) => showHud(f, el));
+      el.addEventListener('mouseleave', () => hideHud());
+      planetsLayer.appendChild(el);
+    });
+
+    function showHud(planet, el) {
+      activePlanet = planet;
+      document.getElementById('hud-avatar').src = planet.avatar;
+      document.getElementById('hud-name').textContent = planet.name;
+      document.getElementById('hud-orbit').textContent = `${planet.orbit} · ${planet.freq} MHz`;
+      document.getElementById('hud-bio').textContent = planet.bio;
+      document.getElementById('hud-link').href = planet.url;
+      const tagsContainer = document.getElementById('hud-tags');
+      tagsContainer.innerHTML = planet.tags.map(t => `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-sky-200 border border-white/20">#${t}</span>`).join('');
+
+      const rect = el.getBoundingClientRect();
+      const parentRect = canvas.parentElement.getBoundingClientRect();
+      let left = rect.left - parentRect.left + 50;
+      let top = rect.top - parentRect.top - 40;
+      if (left + 290 > width) left = left - 340;
+      hud.style.left = left + 'px';
+      hud.style.top = top + 'px';
+      hud.classList.remove('opacity-0', 'scale-95', 'translate-y-2', 'pointer-events-none');
+    }
+
+    function hideHud() {
+      activePlanet = null;
+      hud.classList.add('opacity-0', 'scale-95', 'translate-y-2', 'pointer-events-none');
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+      isHovering = true;
+    });
+    canvas.addEventListener('mouseleave', () => { isHovering = false; });
+
+    function renderOrbit() {
+      ctx.clearRect(0, 0, width, height);
+      const cx = width / 2;
+      const cy = height / 2;
+
+      // 1. 绘制核心恒星 (NAPH130)
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 26, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.2)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+      ctx.fillStyle = '#38bdf8';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 25;
+      ctx.fill();
+      ctx.restore();
+
+      // 2. 绘制同心轨道
+      const orbits = [135, 175, 215, 265];
+      orbits.forEach(r => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.setLineDash([4, 6]);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
+
+      // 3. 计算并绘制每个天体
+      FRIENDS.forEach(f => {
+        if (!activePlanet || activePlanet.id !== f.id) {
+          f.angle += f.speed;
+        }
+        const px = cx + Math.cos(f.angle) * f.radius;
+        const py = cy + Math.sin(f.angle) * f.radius;
+
+        // 更新 DOM 节点位置
+        const dom = document.getElementById(`planet-${f.id}`);
+        if (dom) {
+          dom.style.left = px + 'px';
+          dom.style.top = py + 'px';
+        }
+
+        // 绘制引力射线
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(px, py);
+        ctx.strokeStyle = activePlanet && activePlanet.id === f.id ? 'rgba(56, 189, 248, 0.6)' : 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = activePlanet && activePlanet.id === f.id ? 2 : 1;
+        ctx.stroke();
+
+        // 鼠标排斥/牵引力场微弱连线
+        if (isHovering) {
+          const dist = Math.hypot(mouseX - px, mouseY - py);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(mouseX, mouseY);
+            ctx.lineTo(px, py);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${0.4 * (1 - dist / 120)})`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+        }
+      });
+
+      requestAnimationFrame(renderOrbit);
+    }
+    renderOrbit();
+
+
+    // ==========================================
+    // 概念 2：射电望远镜与示波器波形模拟
+    // ==========================================
+    const scopeCanvas = document.getElementById('scope-canvas');
+    const sCtx = scopeCanvas.getContext('2d');
+    let currentRadio = FRIENDS[0];
+    let scopePhase = 0;
+
+    function startOscilloscope() {
+      scopeCanvas.width = scopeCanvas.clientWidth;
+      scopeCanvas.height = scopeCanvas.clientHeight;
+    }
+
+    function renderScope() {
+      const sw = scopeCanvas.width;
+      const sh = scopeCanvas.height;
+      if (sw === 0) return;
+
+      sCtx.clearRect(0, 0, sw, sh);
+
+      sCtx.beginPath();
+      sCtx.strokeStyle = '#10b981';
+      sCtx.lineWidth = 2;
+      sCtx.shadowColor = '#10b981';
+      sCtx.shadowBlur = 10;
+
+      scopePhase += 0.06;
+      for (let x = 0; x < sw; x++) {
+        const freq = parseFloat(currentRadio.freq) / 500;
+        const y = sh / 2 + 
+          Math.sin(x * 0.04 * freq + scopePhase) * 25 * Math.sin(x * 0.01) + 
+          Math.cos(x * 0.08 + scopePhase * 1.5) * 8;
+        if (x === 0) sCtx.moveTo(x, y);
+        else sCtx.lineTo(x, y);
+      }
+      sCtx.stroke();
+      requestAnimationFrame(renderScope);
+    }
+    renderScope();
+
+    // 渲染无线电列表
+    const channelList = document.getElementById('channel-list');
+    FRIENDS.forEach((f, idx) => {
+      const row = document.createElement('div');
+      row.className = `p-3 border flex items-center justify-between cursor-pointer transition-all ${idx === 0 ? 'bg-emerald-500/20 border-emerald-400' : 'bg-black/30 border-white/15 hover:bg-white/10'}`;
+      row.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-xs ${idx === 0 ? 'text-emerald-400 font-bold' : 'text-neutral-400'}">CH-0${idx + 1}</span>
+          <span class="font-mono font-bold text-sm text-white">${f.name}</span>
+          <span class="text-[11px] font-mono text-sky-400">${f.freq} MHz</span>
+        </div>
+        <span class="text-[10.5px] font-mono px-2 py-0.5 bg-white/10 text-neutral-300">LOCK</span>
+      `;
+      row.addEventListener('click', () => {
+        channelList.querySelectorAll('div').forEach(d => d.className = 'p-3 border flex items-center justify-between cursor-pointer bg-black/30 border-white/15 hover:bg-white/10');
+        row.className = 'p-3 border flex items-center justify-between cursor-pointer bg-emerald-500/20 border-emerald-400';
+        currentRadio = f;
+        updateRadioHud(f);
+      });
+      channelList.appendChild(row);
+    });
+
+    function updateRadioHud(f) {
+      document.getElementById('radio-avatar').src = f.avatar;
+      document.getElementById('radio-name').textContent = f.name;
+      document.getElementById('radio-freq').textContent = `FREQ: ${f.freq} MHz · ${f.orbit}`;
+      document.getElementById('radio-bio').textContent = f.bio;
+      document.getElementById('radio-url-btn').href = f.url;
+      document.getElementById('radio-tags').innerHTML = f.tags.map(t => `<span class="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">#${t}</span>`).join('');
+    }
+    updateRadioHud(FRIENDS[0]);
+
+
+    // ==========================================
+    // 概念 3：3D 晶体透镜卡片倾斜物理
+    // ==========================================
+    const prismGrid = document.getElementById('prism-grid');
+    function renderPrismCards(filter = 'all') {
+      prismGrid.innerHTML = '';
+      const list = filter === 'all' ? FRIENDS : FRIENDS.filter(f => f.category === filter);
+
+      list.forEach(f => {
+        const card = document.createElement('a');
+        card.href = f.url;
+        card.target = '_blank';
+        card.className = 'prism-card rounded-2xl p-5 flex flex-col justify-between cursor-pointer group relative overflow-hidden select-none';
+        card.innerHTML = `
+          <!-- 高光镜面反射层 -->
+          <div class="card-glare absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-200 bg-gradient-to-tr from-transparent via-white/20 to-transparent"></div>
+
+          <div>
+            <div class="flex items-center gap-3">
+              <img src="${f.avatar}" alt="${f.name}" class="w-12 h-12 rounded-xl object-cover border border-white/50 bg-white/20 shadow-sm" />
+              <div class="min-w-0 flex-1">
+                <h3 class="font-comfortaa font-bold text-sm text-white truncate group-hover:text-sky-300 transition-colors">${f.name}</h3>
+                <span class="text-[11px] font-mono text-neutral-400 truncate block mt-0.5">${f.url.replace(/^https?:\/\//, '')}</span>
+              </div>
+            </div>
+            <p class="text-xs text-neutral-300 leading-relaxed mt-3.5 line-clamp-2">${f.bio}</p>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-white/20">
+            ${f.tags.map(t => `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-neutral-200 border border-white/20">#${t}</span>`).join('')}
+          </div>
+        `;
+
+        // 3D 鼠标追踪动力学
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -12;
+          const rotateY = ((x - centerX) / centerX) * 12;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(8px)`;
+
+          const glare = card.querySelector('.card-glare');
+          if (glare) {
+            glare.style.opacity = '1';
+            glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.35) 0%, transparent 60%)`;
+          }
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+          const glare = card.querySelector('.card-glare');
+          if (glare) glare.style.opacity = '0';
+        });
+
+        prismGrid.appendChild(card);
+      });
+    }
+    renderPrismCards();
+
+    function filterPrism(cat) {
+      document.querySelectorAll('.prism-cat').forEach(b => {
+        b.className = 'prism-cat px-3 py-1 rounded-full text-neutral-300 hover:text-white transition-all';
+      });
+      event.target.className = 'prism-cat px-3 py-1 rounded-full bg-white text-neutral-900 font-semibold transition-all';
+      renderPrismCards(cat);
+    }
+
+    // ==========================================
+    // 复制本站信标数据
+    // ==========================================
+    async function copyExchangeData() {
+      const payload = {
+        name: "NAPH130's Blog",
+        url: "https://naph130.top",
+        bio: "探索现代前端工程架构、物理建模与极客美学",
+        avatar: "https://naph130.top/avatar.jpg"
+      };
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      } catch (e) {}
+
+      const toast = document.getElementById('toast');
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2200);
+    }
+  </script>
+</body>
+</html>

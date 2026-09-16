@@ -1,7 +1,16 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import FloatingFriends from '@/components/FloatingFriends';
+import { getAllLocaleFriends } from '@/utils/friends';
+
+const friendsByLocale = await getAllLocaleFriends();
 ---
 
 <BaseLayout title="友链 - NAPH130's Blog" currentPath="/friends">
-  <!-- 友链页主体留空 -->
+  <div class="flex-1 w-full min-h-0 flex items-center justify-center p-3 sm:p-5 lg:p-6 overflow-hidden">
+    {/* 视口约束容器：单屏锁定，直接承载纯粹物理碰撞内栏 */}
+    <div class="w-full max-w-7xl h-full lg:max-h-[calc(100vh-7.5rem)] min-h-[520px] flex flex-col my-auto">
+      <FloatingFriends friendsByLocale={friendsByLocale} client:load />
+    </div>
+  </div>
 </BaseLayout>
