@@ -323,3 +323,52 @@ graph LR
   根据 W3C CSS 规范，当祖先元素设置了 `backdrop-filter`、`transform`、`filter` 或 `perspective` 时，会创建一个**全新的定位包含块（Containing Block）**。这意味着其子元素的 `position: fixed; inset: 0` 不再相对于视口（`window`）计算，而是被迫相对于该祖先元素定位；加之卡片本身具有 `overflow: hidden`，导致固定定位层直接被卡片盒模型截断。
 - **修复方案**：
   使用 `createPortal(content, document.body)` 将悬浮窗直接挂载至 `document.body` 根节点下，彻底摆脱所有卡片局部层叠上下文与裁剪规则，同时升级为大尺寸剧场级磨砂玻璃圆角悬浮窗（`rounded-3xl`、`w-[96vw]`、顶部晶透高光镜面与圆形磨砂控件）。
+
+---
+
+### 2.13 悬浮窗深黑背景沉闷割裂与顶部分割线生硬断层
+- **现象**：悬浮窗初期采用深黑色底（`bg-neutral-900/70` 与内部 `bg-black/25`），并在顶栏与画布之间保留了一条高对比度横向分割线（`border-b border-white/15`）。在全站清亮通透的磨砂质感与明丽壁纸衬托下，大面积黑色浮层显得压抑沉重，顶部分割线亦生硬截断了视线。
+- **根本原因**：
+  惯性延用了传统全屏看图器的暗房沉浸设计，忽视了全站“晶透磨砂玻璃（Frosted Glassmorphism）”设计系统在悬浮窗场景下的延展性；分割线造成了不必要的界面层级硬切。
+- **修复方案**：
+  1. **彻底移除顶部分割线**：删除 `border-b border-white/15`，取消顶栏独立的色块填充，使顶栏与整个悬浮窗玻璃浑然一体，消除断层与硬切感；
+  2. **浅色高透亮磨砂玻璃升级**：
+     - 外壳重构为浅色高饱和透亮磨砂：`bg-white/45 dark:bg-white/35 backdrop-blur-3xl backdrop-saturate-150 border border-white/70 shadow-[0_30px_90px_rgba(0,0,0,0.2),inset_0_1px_2.5px_rgba(255,255,255,0.95)]`；
+     - 剥离主画布内的黑色遮罩（改为 `bg-transparent`），全画幅展现通透磨砂底色；
+  3. **控件高对比度质感升级**：计数胶囊、关闭按钮与左右切换箭纽全部升级为晶透白玉质感圆纽（`bg-white/60~70` 磨砂圆角 + `text-neutral-800` 深色文字与图标），兼顾顶流美学冲击与极佳的阅读对比度。
+
+---
+
+### 2.14 悬浮窗周边文字噪声与非对称状态下的居中漂移
+- **现象**：悬浮窗左上角带有 `● MOMENT VIEWER` 品牌胶囊，左下角与右下角分别常驻“点击背景或按 ESC 退出”及“支持键盘 ← → 快捷键翻页”辅助文本，界面边缘信息繁杂；而在移除左上角标识后，若仅使用常规 `flex justify-between`，中间计数胶囊会因右侧关闭按钮的存在而产生向左偏离的非对称失真。
+- **根本原因**：
+  观影视口内过多的说明性文字侵占了纵向可视面积（原底栏占用高度导致大图最大高度被压缩），破坏了画面的纯粹性；常规 Flex 布局在缺少左侧对等元素时无法实现真正的几何水平居中。
+- **修复方案**：
+  1. **纯净无噪视口**：彻底删除左上角品牌胶囊、左下角与右下角的辅助说明文字，并裁撤整条冗余底栏，将主画布最大高度释放扩增至 `max-h-[80vh] sm:max-h-[84vh]`，使视线完全聚焦于摄影作品与高清原图；
+  2. **绝对几何水平居中**：计数指示胶囊改用绝对定位布局（`absolute left-1/2 -translate-x-1/2`），无论右侧是否存在关闭按钮，页码均精准锁定在视口 50% 几何中线上，视觉稳固平衡。
+
+---
+
+### 2.15 Astro ClientRouter 切页状态重置与 Flexbox `min-height: auto` 导致的轮播图外溢撑爆
+- **现象**：在进入“动态”页正常浏览后，若点击顶部导航切换至“首页”、“简介”、“文章”或“友链”等其他页面，再次点击“动态”返回时，三图轮播卡片出现严重的几何坍塌与畸变：中间卡片纵向暴增 70px~150px，上下暴力刺穿轮播图容器边框，甚至遮挡住卡片下方的正文文字，宛如布局错乱爆开。
+- **根本原因**：
+  由 **客户端路由生命周期缓存丢失** 与 **CSS Flexbox 规范级默认最小尺寸限制** 发生恶性偶合所致：
+  1. **Astro ClientRouter 组件卸载与内存缓存失效**：
+     Astro 采用单页应用（SPA）平滑无刷新过渡，当从 `/moments` 离开时，React 组件树被卸载销毁；返回时组件重新挂载，`useState` 的局部缓存字典 `aspectRatios` 初始化为空 `{}`。
+  2. **Image `onload` 死锁陷阱**：
+     在重载阶段，由于图片已存留在浏览器内存与 HTTP 缓存中，若在设置 `img.onload` 之前先写入 `img.src`，或者没有检查 `img.complete && img.naturalWidth`，已缓存图片的 `onload` 事件由于同步完成而永远不会再次被触发。这导致 `aspectRatios` 无法更新，画幅比例回退为默认的横向宽幅比例（`1.5`，对应高度 `h-[215px]`）。
+  3. **Flexbox 规范中的 `min-height: auto` 恶性撑开机制**：
+     轮播图容器采用了 `flex items-center` 布局，而根据 W3C CSS Flexbox 规范，Flex 项目（`group/center`）在垂直方向上的 `min-height` 默认值不是 `0`，而是 `auto`。当内部放入正方形（1:1）或竖图（9:16）且子元素赋予了横向宽度（如 `w-[64%]` 约 470px）时，`<img>` 会以自身自然比例（470px 高度）强行将父级 Flex 项目 `group/center` 的最小高度撑大至 470px，即使外层容器仅设置了 `h-[215px]`，Flex 子项依然会强行突破容器高度边界向上向下溢出达 255px！
+  4. **层叠上下文（Stacking Context）逃逸**：
+     由于中间卡片被赋予了 `z-20`（具备独立的层叠上下文），而外层 `group/carousel` 容器没有 `isolate` 或剪裁控制，导致溢出的中间图片直接渲染在最顶层，无视了外部卡片的容器边界。
+- **修复方案**：
+  1. **模块级全局比例持久缓存 (`globalAspectRatioCache`)**：
+     在组件外层声明 `const globalAspectRatioCache = new Map<string, number>()`。无论 Astro ClientRouter 如何切页卸载 React 组件，模块层级的全局内存缓存均完整保留已解析图片的真实画幅比，切页返回时 `useState` 直接使用缓存瞬时渲染，无需等待异步网络回包。
+  2. **双重防御的健壮图片预载器**：
+     在 `useEffect` 中确保 `img.onload` 监听器**必须在 `img.src = src` 赋值之前绑定**；并在赋值后立即检查 `if (img.complete && img.naturalWidth)`，一旦命中浏览器缓存直接同步入库并触发组件重绘。
+  3. **CSS 规范级约束消解 `min-height: auto` 膨胀**：
+     在 `group/carousel` 容器上施加 `isolate overflow-hidden max-h-[285px]`；在 Flex 子项 `group/center` 上严格补充 `h-full max-h-full min-h-0 overflow-hidden`，将 flex item 的默认 `min-height: auto` 强制压制为 `min-h-0`，并用 `max-h-full` 锁死在容器边界内。
+  4. **图片元素自适应限高 (`max-w-full max-h-full object-contain`)**：
+     中心图片由可能导致纵向失控的样式全面更替为 `relative z-10 max-w-full max-h-full w-auto h-auto object-contain loading="eager"`，SVG 矢量资源亦补齐精准像素级 `width` 与 `height` 属性，确保任何形状与比例的图片在跨页返回时均 100% 严谨拘束在格栅轮播画框内。
+
+

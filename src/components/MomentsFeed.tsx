@@ -179,6 +179,9 @@ export const MomentLightbox: React.FC<MomentLightboxProps> = ({
   return createPortal(content, document.body);
 };
 
+// 全局模块级图片原始宽高比缓存（跨页面切换持久保持，杜绝 Astro ClientRouter 切页重载时状态重置引发的尺寸失控）
+const globalAspectRatioCache = new Map<string, number>();
+
 interface MomentCarouselProps {
   images: string[];
 }
@@ -196,7 +199,25 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
-  const [aspectRatios, setAspectRatios] = useState<Record<string, number>>({});
+
+  // 初始状态优先从全局缓存填充，首帧即可精确感知比例，杜绝切页重置抖动
+  const [aspectRatios, setAspectRatios] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    if (images && Array.isArray(images)) {
+      images.forEach((src) => {
+        if (src && globalAspectRatioCache.has(src)) {
+          initial[src] = globalAspectRatioCache.get(src)!;
+        }
+      });
+    }
+    return initial;
+  });
+
+  const recordRatio = (src: string, ratio: number) => {
+    if (!src || !ratio || !Number.isFinite(ratio)) return;
+    globalAspectRatioCache.set(src, ratio);
+    setAspectRatios((prev) => (prev[src] === ratio ? prev : { ...prev, [src]: ratio }));
+  };
 
   if (!images || images.length === 0) return null;
 
@@ -206,22 +227,29 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
   useEffect(() => {
     images.forEach((src) => {
       if (!src) return;
+      if (globalAspectRatioCache.has(src)) {
+        recordRatio(src, globalAspectRatioCache.get(src)!);
+        return;
+      }
       const img = new Image();
-      img.src = src;
       img.onload = () => {
         if (img.naturalWidth && img.naturalHeight) {
-          const ratio = img.naturalWidth / img.naturalHeight;
-          setAspectRatios((prev) => (prev[src] === ratio ? prev : { ...prev, [src]: ratio }));
+          recordRatio(src, img.naturalWidth / img.naturalHeight);
         }
       };
+      // 必须先挂载 onload 再赋值 src，保障无论网络延时还是内存缓存均能稳定捕获尺寸
+      img.src = src;
+      // 针对命中内存缓存的图片，complete 立即为 true
+      if (img.complete && img.naturalWidth && img.naturalHeight) {
+        recordRatio(src, img.naturalWidth / img.naturalHeight);
+      }
     });
   }, [images]);
 
   const handleImageLoad = (src: string, e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     if (img.naturalWidth && img.naturalHeight) {
-      const ratio = img.naturalWidth / img.naturalHeight;
-      setAspectRatios((prev) => (prev[src] === ratio ? prev : { ...prev, [src]: ratio }));
+      recordRatio(src, img.naturalWidth / img.naturalHeight);
     }
   };
 
@@ -314,15 +342,15 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
         <div className="w-full flex items-center justify-center py-0.5">
           <div
             onClick={() => setIsLightboxOpen(true)}
-            className="group/single relative inline-flex items-center justify-center max-h-[260px] sm:max-h-[300px] max-w-full overflow-hidden rounded-none bg-neutral-950/5 border border-white/80 shadow-md cursor-zoom-in transition-transform duration-300 hover:scale-[1.01]"
+            className="group/single relative inline-flex items-center justify-center max-h-[260px] sm:max-h-[290px] max-w-full overflow-hidden rounded-none bg-neutral-950/5 border border-white/80 shadow-md cursor-zoom-in transition-transform duration-300 hover:scale-[1.01]"
             title="点击查看全屏大图"
           >
             <img
               src={images[0]}
               alt="Moment image"
               onLoad={(e) => handleImageLoad(images[0], e)}
-              className="max-h-[260px] sm:max-h-[300px] w-auto max-w-full object-contain rounded-none pointer-events-none select-none"
-              loading="lazy"
+              className="max-h-[260px] sm:max-h-[290px] max-w-full w-auto h-auto object-contain rounded-none pointer-events-none select-none"
+              loading="eager"
             />
             <div className="absolute top-2 left-2 p-1 bg-black/45 backdrop-blur-md text-white/90 opacity-0 group-hover/single:opacity-100 transition-opacity duration-200 pointer-events-none">
               <ZoomIn className="w-3.5 h-3.5" />
@@ -330,9 +358,9 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
           </div>
         </div>
       ) : (
-        /* 多张图片时的格栅层叠视口容器：高度随主图画幅自适应过渡 */
+        /* 多张图片时的格栅层叠视口容器：严格隔离层叠上下文与尺寸约束 */
         <div
-          className={`group/carousel relative w-full ${containerHeightClass} overflow-hidden rounded-none bg-neutral-900/[0.03] border border-neutral-900/10 flex items-center justify-center transition-[height] duration-300 ease-out`}
+          className={`group/carousel relative w-full ${containerHeightClass} max-h-[285px] overflow-hidden rounded-none bg-neutral-900/[0.03] border border-neutral-900/10 flex items-center justify-center transition-[height] duration-300 ease-out isolate`}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -342,50 +370,50 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
               {/* 左侧被遮挡图片：部分被中间主图遮挡（格栅状），半透明与微模糊，点击切换至该图 */}
               <div
                 onClick={() => setCurrentIndex(prevIndex)}
-                className={`absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 ${sideCardWidthClass} h-[88%] z-10 opacity-40 hover:opacity-75 blur-[1.5px] hover:blur-none scale-[0.96] transition-all duration-300 cursor-pointer overflow-hidden rounded-none border border-white/40 shadow-xs`}
+                className={`absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 ${sideCardWidthClass} h-[88%] max-h-[88%] min-h-0 z-10 opacity-40 hover:opacity-75 blur-[1.5px] hover:blur-none scale-[0.96] transition-all duration-300 cursor-pointer overflow-hidden rounded-none border border-white/40 shadow-xs flex items-center justify-center`}
                 title="切换至上一张"
               >
                 <img
                   src={images[prevIndex]}
                   alt="Previous image"
                   className="w-full h-full object-cover rounded-none pointer-events-none select-none"
-                  loading="lazy"
+                  loading="eager"
                 />
               </div>
 
               {/* 右侧被遮挡图片：部分被中间主图遮挡（格栅状），半透明与微模糊，点击切换至该图 */}
               <div
                 onClick={() => setCurrentIndex(nextIndex)}
-                className={`absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 ${sideCardWidthClass} h-[88%] z-10 opacity-40 hover:opacity-75 blur-[1.5px] hover:blur-none scale-[0.96] transition-all duration-300 cursor-pointer overflow-hidden rounded-none border border-white/40 shadow-xs`}
+                className={`absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 ${sideCardWidthClass} h-[88%] max-h-[88%] min-h-0 z-10 opacity-40 hover:opacity-75 blur-[1.5px] hover:blur-none scale-[0.96] transition-all duration-300 cursor-pointer overflow-hidden rounded-none border border-white/40 shadow-xs flex items-center justify-center`}
                 title="切换至下一张"
               >
                 <img
                   src={images[nextIndex]}
                   alt="Next image"
                   className="w-full h-full object-cover rounded-none pointer-events-none select-none"
-                  loading="lazy"
+                  loading="eager"
                 />
               </div>
 
-              {/* 中间主图：顶层 z-20，双层结构（底层环境柔光高斯模糊 + 顶层完整比例无裁切 object-contain） */}
+              {/* 中间主图：顶层 z-20，强制收容在父高度内，绝不出界 */}
               <div
                 onClick={() => setIsLightboxOpen(true)}
-                className={`group/center relative z-20 ${centerCardWidthClass} h-full overflow-hidden rounded-none bg-neutral-950/5 border border-white/80 shadow-md cursor-zoom-in transition-all duration-300 hover:scale-[1.01]`}
+                className={`group/center relative z-20 ${centerCardWidthClass} h-full max-h-full min-h-0 overflow-hidden rounded-none bg-neutral-950/5 border border-white/80 shadow-md cursor-zoom-in transition-all duration-300 hover:scale-[1.01] flex items-center justify-center`}
                 title="点击查看全屏大图"
               >
                 {/* 底层环境高斯模糊填色，使任何画幅都有契合原图色调的优雅微光 */}
                 <img
                   src={images[currentIndex]}
                   alt=""
-                  className="absolute inset-0 w-full h-full object-cover blur-lg opacity-35 scale-110 pointer-events-none select-none"
+                  className="absolute inset-0 w-full h-full object-cover blur-lg opacity-35 pointer-events-none select-none"
                 />
-                {/* 顶层原图：object-contain 保持完整宽高比，竖图构图与文字一览无余，绝不暴力剪裁 */}
+                {/* 顶层原图：object-contain 保持完整宽高比，严格限制在 max-h-full 与 max-w-full 之内 */}
                 <img
                   src={images[currentIndex]}
                   alt={`Moment image ${currentIndex + 1} of ${total}`}
                   onLoad={(e) => handleImageLoad(images[currentIndex], e)}
-                  className="relative z-10 w-full h-full object-contain rounded-none pointer-events-none select-none drop-shadow-sm"
-                  loading="lazy"
+                  className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain rounded-none pointer-events-none select-none drop-shadow-sm"
+                  loading="eager"
                 />
                 {/* 悬浮放大提示微角标 */}
                 <div className="absolute top-2 left-2 z-20 p-1 bg-black/45 backdrop-blur-md text-white/90 opacity-0 group-hover/center:opacity-100 transition-opacity duration-200 pointer-events-none">
@@ -398,32 +426,32 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
             <>
               <div
                 onClick={() => setIsLightboxOpen(true)}
-                className={`group/center relative z-20 ${centerCardWidthClass} h-full overflow-hidden rounded-none bg-neutral-950/5 border border-white/80 shadow-md cursor-zoom-in transition-all duration-300`}
+                className={`group/center relative z-20 ${centerCardWidthClass} h-full max-h-full min-h-0 overflow-hidden rounded-none bg-neutral-950/5 border border-white/80 shadow-md cursor-zoom-in transition-all duration-300 flex items-center justify-center`}
                 title="点击查看全屏大图"
               >
                 <img
                   src={images[currentIndex]}
                   alt=""
-                  className="absolute inset-0 w-full h-full object-cover blur-lg opacity-35 scale-110 pointer-events-none select-none"
+                  className="absolute inset-0 w-full h-full object-cover blur-lg opacity-35 pointer-events-none select-none"
                 />
                 <img
                   src={images[currentIndex]}
                   alt={`Moment image ${currentIndex + 1} of ${total}`}
                   onLoad={(e) => handleImageLoad(images[currentIndex], e)}
-                  className="relative z-10 w-full h-full object-contain rounded-none pointer-events-none select-none drop-shadow-sm"
-                  loading="lazy"
+                  className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain rounded-none pointer-events-none select-none drop-shadow-sm"
+                  loading="eager"
                 />
               </div>
               <div
                 onClick={() => setCurrentIndex((currentIndex + 1) % 2)}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 ${sideCardWidthClass} h-[88%] z-10 opacity-40 hover:opacity-75 blur-[1.5px] hover:blur-none scale-[0.96] transition-all duration-300 cursor-pointer overflow-hidden rounded-none border border-white/40 shadow-xs`}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 ${sideCardWidthClass} h-[88%] max-h-[88%] min-h-0 z-10 opacity-40 hover:opacity-75 blur-[1.5px] hover:blur-none scale-[0.96] transition-all duration-300 cursor-pointer overflow-hidden rounded-none border border-white/40 shadow-xs flex items-center justify-center`}
                 title="切换图片"
               >
                 <img
                   src={images[(currentIndex + 1) % 2]}
                   alt="Next image"
                   className="w-full h-full object-cover rounded-none pointer-events-none select-none"
-                  loading="lazy"
+                  loading="eager"
                 />
               </div>
             </>
