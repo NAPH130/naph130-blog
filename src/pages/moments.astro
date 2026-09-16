@@ -4,24 +4,45 @@ import BlogSidebar from '@/components/BlogSidebar';
 import PageHeader from '@/components/PageHeader';
 import MomentsFeed from '@/components/MomentsFeed';
 import { getAllLocalePosts } from '@/utils/posts';
+import { getAllLocaleMoments } from '@/utils/moments';
 
-// 分语言获取所有语言子目录下的文章工程
+// 分语言获取所有语言子目录下的文章工程与动态工程
 const postsByLocale = await getAllLocalePosts();
+const momentsByLocale = await getAllLocaleMoments();
 
 // 统计各语言包数据
-const statsByLocale: Record<string, { postCount: number; tagCount: number }> = {};
+const statsByLocale: Record<string, { postCount: number; tagCount: number; momentCount: number }> = {};
+const countsByLocale: Record<string, number> = {};
 
 for (const [locale, list] of Object.entries(postsByLocale)) {
+  const mCount = momentsByLocale[locale]?.totalCount || 0;
   statsByLocale[locale] = {
     postCount: list.length,
     tagCount: new Set(list.flatMap((p) => p.tags)).size,
+    momentCount: mCount,
   };
+  countsByLocale[locale] = mCount;
+}
+
+for (const [locale, mData] of Object.entries(momentsByLocale)) {
+  countsByLocale[locale] = mData.totalCount;
+  if (statsByLocale[locale]) {
+    statsByLocale[locale].momentCount = mData.totalCount;
+  } else {
+    statsByLocale[locale] = {
+      postCount: 0,
+      tagCount: 0,
+      momentCount: mData.totalCount,
+    };
+  }
 }
 
 // 默认初始展示中文语言包统计
 const defaultPosts = postsByLocale['zh_cn'] || [];
+const defaultMoments = momentsByLocale['zh_cn']?.raw || [];
 const postCount = defaultPosts.length;
 const tagCount = statsByLocale['zh_cn']?.tagCount || 0;
+const momentCount = defaultMoments.length;
 ---
 
 <BaseLayout title="动态 - NAPH130's Blog" currentPath="/moments">
@@ -33,7 +54,7 @@ const tagCount = statsByLocale['zh_cn']?.tagCount || 0;
         <BlogSidebar
           postCount={postCount}
           tagCount={tagCount}
-          momentCount={0}
+          momentCount={momentCount}
           statsByLocale={statsByLocale}
           showStats={false}
           client:load
@@ -44,12 +65,17 @@ const tagCount = statsByLocale['zh_cn']?.tagCount || 0;
       <div class="flex-1 min-w-0 w-full h-auto lg:h-full min-h-[450px] lg:min-h-0 rounded-3xl bg-white/20 backdrop-blur-2xl border border-white/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden">
         {/* 固定顶部标头栏 */}
         <div class="p-6 sm:p-8 pb-4 shrink-0">
-          <PageHeader type="moments" count={0} client:load />
+          <PageHeader
+            type="moments"
+            count={momentCount}
+            countsByLocale={countsByLocale}
+            client:load
+          />
         </div>
 
-        {/* 内部区域 */}
-        <div class="flex-1 min-h-0 overflow-y-auto px-6 sm:px-8 pb-8 custom-slidebar pr-3 sm:pr-5 flex items-center justify-center">
-          <MomentsFeed client:load />
+        {/* 内部动态流滚动区：右侧专属 Slide Bar */}
+        <div class="flex-1 min-h-0 overflow-y-auto pl-6 sm:pl-8 pr-3 sm:pr-5 pb-8 custom-slidebar">
+          <MomentsFeed momentsByLocale={momentsByLocale} client:load />
         </div>
       </div>
     </div>

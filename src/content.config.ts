@@ -18,4 +18,25 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { posts };
+const moments = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/moments' }),
+  schema: z.object({
+    moments: z
+      .array(
+        z.object({
+          date: z.string().optional(),
+          year: z.number().optional(),
+          month: z.number().optional(),
+          day: z.number().optional(),
+          time: z.string().optional(),
+          content: z.string(),
+          tags: z.array(z.string()).default([]),
+          mood: z.string().optional(),
+          images: z.array(z.string()).nullish().transform((val) => val ?? []),
+        })
+      )
+      .default([]),
+  }),
+});
+
+export const collections = { posts, moments };

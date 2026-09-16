@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g_photo_2_svg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="50%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#fb923c" />
+    </linearGradient>
+    <pattern id="grid_g_photo_2_svg" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background without rounded corners -->
+  <rect width="540" height="960" fill="url(#g_photo_2_svg)" />
+  <rect width="540" height="960" fill="url(#grid_g_photo_2_svg)" />
+
+  <!-- Ambient visual circles -->
+  <circle cx="135" cy="288" r="162" fill="white" fill-opacity="0.12" />
+  <circle cx="405" cy="672" r="189" fill="white" fill-opacity="0.08" />
+
+  <!-- Center frame box (straight corners) -->
+  <rect x="43.20000000000002" y="340" width="453.59999999999997" height="280" fill="black" fill-opacity="0.25" stroke="white" stroke-opacity="0.4" stroke-width="2" />
+
+  <!-- Typography -->
+  <text x="270" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="29.7" font-weight="800" fill="white" text-anchor="middle" letter-spacing="2">
+    PHOTO-2.SVG
+  </text>
+  <text x="270" y="498" font-family="monospace, sans-serif" font-size="20.52" font-weight="600" fill="#f8fafc" text-anchor="middle" letter-spacing="1">
+    9:16 Portrait (Mobile Story)
+  </text>
+  <text x="270" y="528" font-family="monospace, sans-serif" font-size="16.2" fill="white" fill-opacity="0.75" text-anchor="middle">
+    540 × 960 px
+  </text>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g_photo_5_svg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <pattern id="grid_g_photo_5_svg" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background without rounded corners -->
+  <rect width="600" height="800" fill="url(#g_photo_5_svg)" />
+  <rect width="600" height="800" fill="url(#grid_g_photo_5_svg)" />
+
+  <!-- Ambient visual circles -->
+  <circle cx="150" cy="240" r="180" fill="white" fill-opacity="0.12" />
+  <circle cx="450" cy="560" r="210" fill="white" fill-opacity="0.08" />
+
+  <!-- Center frame box (straight corners) -->
+  <rect x="48" y="260" width="504" height="280" fill="black" fill-opacity="0.25" stroke="white" stroke-opacity="0.4" stroke-width="2" />
+
+  <!-- Typography -->
+  <text x="300" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="33" font-weight="800" fill="white" text-anchor="middle" letter-spacing="2">
+    PHOTO-5.SVG
+  </text>
+  <text x="300" y="418" font-family="monospace, sans-serif" font-size="22.8" font-weight="600" fill="#f8fafc" text-anchor="middle" letter-spacing="1">
+    3:4 Portrait (Vertical Studio)
+  </text>
+  <text x="300" y="448" font-family="monospace, sans-serif" font-size="18" fill="white" fill-opacity="0.75" text-anchor="middle">
+    600 × 800 px
+  </text>
+</svg>

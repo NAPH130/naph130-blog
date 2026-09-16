@@ -6,7 +6,7 @@ interface BlogSidebarProps {
   postCount?: number;
   tagCount?: number;
   momentCount?: number;
-  statsByLocale?: Record<string, { postCount: number; tagCount: number }>;
+  statsByLocale?: Record<string, { postCount: number; tagCount: number; momentCount?: number }>;
   showStats?: boolean;
 }
 
@@ -112,6 +112,7 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
 
   const currentPostCount = statsByLocale?.[targetLocale]?.postCount ?? postCount;
   const currentTagCount = statsByLocale?.[targetLocale]?.tagCount ?? tagCount;
+  const currentMomentCount = statsByLocale?.[targetLocale]?.momentCount ?? momentCount;
 
   return (
     <aside className="w-full h-full min-h-0 flex flex-col gap-3.5 select-none font-sans">
@@ -158,7 +159,7 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
           </div>
           <div className="flex flex-col items-center">
             <span className="text-base sm:text-lg font-bold font-mono text-neutral-900">
-              {momentCount}
+              {currentMomentCount}
             </span>
             <span className="text-[11px] font-medium text-neutral-700 mt-0.5">
               {textMoments}
@@ -204,7 +205,7 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
               <Sparkles className="w-4 h-4 text-neutral-700 shrink-0" />
               <div>
                 <div className="text-sm sm:text-base font-bold font-mono text-neutral-900 leading-tight">
-                  {momentCount}
+                  {currentMomentCount}
                 </div>
                 <div className="text-[10px] font-medium text-neutral-700 mt-0.5">
                   {textMoments}

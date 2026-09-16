@@ -125,6 +125,28 @@
     0 12px 32px -8px rgba(0, 0, 0, 0.15);
 }
 
+/* 动态流专属极简透亮磨砂卡片 */
+.moment-card {
+  background-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(28px) saturate(145%);
+  -webkit-backdrop-filter: blur(28px) saturate(145%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 8px 30px -6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.9);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.moment-card:hover {
+  background-color: rgba(255, 255, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 16px 36px -8px rgba(0, 0, 0, 0.13),
+    0 0 24px rgba(56, 189, 248, 0.15),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+}
+
 /* 文章详情页专属晶透磨砂玻璃胶囊返回按钮 (Frosted Glass Pill) */
 .frosted-glass-back-btn {
   background-color: rgba(255, 255, 255, 0.65);

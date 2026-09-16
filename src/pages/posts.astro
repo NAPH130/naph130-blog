@@ -4,26 +4,32 @@ import BlogSidebar from '@/components/BlogSidebar';
 import PageHeader from '@/components/PageHeader';
 import PostList from '@/components/PostList';
 import { getAllLocalePosts } from '@/utils/posts';
+import { getAllLocaleMoments } from '@/utils/moments';
 
-// 分语言获取所有语言子目录下的文章工程
+// 分语言获取所有语言子目录下的文章与动态工程
 const postsByLocale = await getAllLocalePosts();
+const momentsByLocale = await getAllLocaleMoments();
 
 // 统计各语言包数据
-const statsByLocale: Record<string, { postCount: number; tagCount: number }> = {};
+const statsByLocale: Record<string, { postCount: number; tagCount: number; momentCount: number }> = {};
 const countsByLocale: Record<string, number> = {};
 
 for (const [locale, list] of Object.entries(postsByLocale)) {
+  const mCount = momentsByLocale[locale]?.totalCount || 0;
   statsByLocale[locale] = {
     postCount: list.length,
     tagCount: new Set(list.flatMap((p) => p.tags)).size,
+    momentCount: mCount,
   };
   countsByLocale[locale] = list.length;
 }
 
 // 默认初始展示中文语言包统计
 const defaultPosts = postsByLocale['zh_cn'] || [];
+const defaultMoments = momentsByLocale['zh_cn']?.raw || [];
 const postCount = defaultPosts.length;
 const tagCount = statsByLocale['zh_cn']?.tagCount || 0;
+const momentCount = defaultMoments.length;
 ---
 
 <BaseLayout title="文章 - NAPH130's Blog" currentPath="/posts">
@@ -35,7 +41,7 @@ const tagCount = statsByLocale['zh_cn']?.tagCount || 0;
         <BlogSidebar
           postCount={postCount}
           tagCount={tagCount}
-          momentCount={0}
+          momentCount={momentCount}
           statsByLocale={statsByLocale}
           showStats={false}
           client:load
