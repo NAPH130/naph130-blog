@@ -17,13 +17,13 @@ interface PhysicalNode {
   friend: FriendItem;
 }
 
-// 目标稳定巡航速度与边界安全边距 (预留头像与下方 ID 标签空间)
+// 目标稳定巡航速度与边界安全边距 (放大 1.5 倍: 头像直径 96px，预留下方 ID 徽章空间)
 const CRUISING_SPEED = 1.35;
-const NODE_RADIUS = 32; // 直径 64px
-const BOUNDARY_MARGIN_X = 52;
-const BOUNDARY_MARGIN_TOP = 42;
-const BOUNDARY_MARGIN_BOTTOM = 70;
-const COLLISION_DISTANCE = 68; // 弹性碰撞缓冲间距
+const NODE_RADIUS = 48; // 直径 96px (原 64px * 1.5)
+const BOUNDARY_MARGIN_X = 76; // 半宽 70px + 6px 安全边距
+const BOUNDARY_MARGIN_TOP = 56; // 半径 48px + 8px
+const BOUNDARY_MARGIN_BOTTOM = 96; // 半径 48px + 标签 30px + 18px 底部缓冲
+const COLLISION_DISTANCE = 100; // 48 * 2 + 4px 弹性碰撞缓冲间距
 
 export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
   friendsByLocale,
@@ -380,19 +380,41 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '64px',
+              width: '96px',
               willChange: 'transform',
             }}
             className="group cursor-pointer z-10 select-none touch-manipulation flex flex-col items-center"
             title={friend.id}
           >
-            {/* 1. 圆形头像外壳 */}
-            <div className="relative w-16 h-16 rounded-full p-1 bg-white/30 dark:bg-white/20 backdrop-blur-md border border-white/70 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.2)] transition-transform duration-200 group-hover:scale-110 flex items-center justify-center overflow-hidden shrink-0">
+            {/* 1. 圆形头像外壳：严格锁定 1:1 正方形与 96px 物理尺寸，杜绝 Flexbox min-height: auto 导致的椭圆畸形 */}
+            <div
+              style={{
+                width: '96px',
+                height: '96px',
+                minWidth: '96px',
+                minHeight: '96px',
+                maxWidth: '96px',
+                maxHeight: '96px',
+                aspectRatio: '1 / 1',
+              }}
+              className="relative w-24 h-24 rounded-full p-1.5 bg-white/30 dark:bg-white/20 backdrop-blur-md border border-white/70 shadow-[0_10px_28px_-4px_rgba(0,0,0,0.22)] transition-transform duration-200 group-hover:scale-110 flex items-center justify-center overflow-hidden shrink-0 aspect-square"
+            >
               {friend.avatar ? (
                 <img
                   src={friend.avatar}
                   alt={friend.id}
-                  className="w-full h-full rounded-full object-cover pointer-events-none"
+                  width="96"
+                  height="96"
+                  loading="eager"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    minWidth: 0,
+                    minHeight: 0,
+                    aspectRatio: '1 / 1',
+                    objectFit: 'cover',
+                  }}
+                  className="w-full h-full rounded-full object-cover pointer-events-none aspect-square min-w-0 min-h-0"
                   onError={(e) => {
                     (e.currentTarget as HTMLElement).style.display = 'none';
                     const fallback = e.currentTarget.nextElementSibling as HTMLElement;
@@ -400,9 +422,16 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
                   }}
                 />
               ) : null}
-              {/* 首字母降级备用徽章 */}
+              {/* 首字母降级备用徽章：同样严格锁定 aspect-square */}
               <div
-                className={`w-full h-full rounded-full items-center justify-center font-mono font-bold text-xs text-neutral-800 dark:text-white bg-white/40 ${
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  minWidth: 0,
+                  minHeight: 0,
+                  aspectRatio: '1 / 1',
+                }}
+                className={`w-full h-full rounded-full items-center justify-center font-mono font-bold text-sm sm:text-base text-neutral-800 dark:text-white bg-white/40 aspect-square min-w-0 min-h-0 ${
                   friend.avatar ? 'hidden' : 'flex'
                 }`}
               >
@@ -411,12 +440,12 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
             </div>
 
             {/* 2. 头像正下方显示 ID */}
-            <div className="mt-1.5 px-2 py-0.5 max-w-[96px] truncate text-center font-mono text-[11px] font-semibold text-neutral-800 dark:text-neutral-100 bg-white/30 dark:bg-black/40 backdrop-blur-md rounded-full border border-white/40 shadow-xs pointer-events-none">
+            <div className="mt-2 px-3 py-1 max-w-[140px] truncate text-center font-mono text-xs sm:text-sm font-semibold text-neutral-800 dark:text-neutral-100 bg-white/30 dark:bg-black/40 backdrop-blur-md rounded-full border border-white/40 shadow-xs pointer-events-none">
               {friend.id}
             </div>
 
             {/* 悬停光晕 */}
-            <div className="absolute top-0 left-0 w-16 h-16 -z-10 rounded-full bg-sky-400/25 blur-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute top-0 left-0 w-24 h-24 -z-10 rounded-full bg-sky-400/25 blur-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </div>
         );
       })}

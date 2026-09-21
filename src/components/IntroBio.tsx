@@ -5,7 +5,7 @@ export const IntroBio: React.FC = () => {
   const [lang, setLang] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('naph130_lang');
-      return saved === 'en' || saved === 'en-US' ? 'en' : 'zh';
+      return saved === 'en' || saved === 'en_us' || saved === 'en-US' ? 'en' : 'zh';
     }
     return 'zh';
   });
@@ -14,7 +14,7 @@ export const IntroBio: React.FC = () => {
     const handleLangChange = (e: Event) => {
       const customEvent = e as CustomEvent<string>;
       const code = customEvent.detail;
-      setLang(code === 'en' || code === 'en-US' ? 'en' : 'zh');
+      setLang(code === 'en' || code === 'en_us' || code === 'en-US' ? 'en' : 'zh');
     };
 
     window.addEventListener('naph130:lang-change', handleLangChange);

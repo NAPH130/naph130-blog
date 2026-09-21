@@ -199,6 +199,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
           <div className="flex items-center justify-end gap-3 sm:gap-4 text-white shrink-0 z-10 min-w-[220px]">
             {/* 语言切换菜单（半透明高通透磨砂玻璃质感） */}
             <div
+              ref={langMenuRef}
               className="relative group"
               onMouseEnter={() => setIsLangOpen(true)}
               onMouseLeave={() => setIsLangOpen(false)}

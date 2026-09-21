@@ -27,9 +27,10 @@
 
 ### 1.2 二维完全弹性碰撞物理仿真引擎 (2D Elastic Collision Physics)
 在 `FloatingFriends.tsx` 中，每个头像节点抽象为一个具有质量、速度矢量和固定半径的物理刚体：
+- **几何规格（1.5 倍放大标准）**：头像物理半径 $R = 48\text{px}$（直径 $96\text{px}$，对应 Tailwind `w-24 h-24`），碰撞缓冲间距 $\text{COLLISION\_DISTANCE} = 100\text{px}$；
+- **安全呼吸边界**：水平边界裕量 $\text{BOUNDARY\_MARGIN\_X} = 76\text{px}$，顶部裕量 $\text{BOUNDARY\_MARGIN\_TOP} = 56\text{px}$，底部预留 ID 胶囊空间 $\text{BOUNDARY\_MARGIN\_BOTTOM} = 96\text{px}$，确保漫游节点与下方 ID 文本永远不触底、不贴边、不产生切模破损。
+
 1. **边界碰撞检测与镜面反弹 (Wall Bouncing)**：
-   在容器尺寸 $W \times H$ 与节点半径 $R$ 的约束下：
-   $$
    x \le R \implies x = R, \quad v_x = |v_x|
    $$
    $$
@@ -91,3 +92,10 @@
 - **修复**：
   1. 将边框检测与钳制严格置于球体碰撞分离**之后**执行；
   2. 引入充足的边界安全裕量（`BOUNDARY_MARGIN = 44px`），使 64px 头像在放大、描边与外阴影下与容器外框始终保持至少 12px 的呼吸间隙，彻底杜绝边界溢出。
+
+### 坑 5：ClientRouter 切换切入友链页时 Flexbox min-height/width: auto 导致的“头像变成椭圆畸形”
+- **现象**：从首页、文章页或动态页通过顶部导航切入友链页时，部分圆形头像变成了扁平或拉长的椭圆形畸形。
+- **原因**：根据 W3C Flexbox 规范（§4.5），在 `display: flex; align-items: center; justify-content: center;` 容器中，作为替换元素（Replaced Element）的子级 `<img>` 默认具备 `min-width: auto; min-height: auto;`。当页面通过 ClientRouter 转场加载时，浏览器内存中已缓存了图片的原始非正方形分辨率（例如 150x225 竖图或 150x103 横图），`min-height: auto` 依据原始宽高比直接覆盖并撑破了 `h-full`（84px），强行扩张为 126px！在具有 `rounded-full`（`border-radius: 9999px`）的非正方形容器中，直接退化为拉长或压扁的椭圆形畸变。
+- **修复**：
+  1. 在头像外壳容器与内部 `<img>` 上同时声明 `aspect-square`（`aspect-ratio: 1 / 1 !important`）与硬编码几何尺寸限制（`min-w-[96px] min-h-[96px] max-w-[96px] max-h-[96px]`）；
+  2. 为 `<img>` 显式声明 `min-w-0 min-h-0 width="96" height="96"` 与 `object-fit: cover`，彻底抹除 Flexbox 固有尺寸对几何圆形的拉伸影响。

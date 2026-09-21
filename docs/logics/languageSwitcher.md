@@ -60,3 +60,13 @@
   3. `TableOfContents` 增加 `locale` 属性，标头支持 `Table of Contents`，徽章单位由 `节` 变为 `sections`，进度由 `当前进度` 变为 `Progress`；
   4. `HeaderNav.handleSelectLang` 增加文章路由正则匹配，在切语时自动在 `zh_cn` 与 `en_us` 间换向跳转。
 
+
+### 坑 3：HeaderNav 语言下拉菜单 langMenuRef 未绑定 JSX 节点导致外部点击关闭失效
+- **现象**：点击或展开语言下拉菜单后，点击页面空白处无法收起菜单；在移动端点击可能无法稳定呼出。
+- **原因**：组件声明了 `const langMenuRef = useRef<HTMLDivElement>(null)`，但在 JSX 中遗漏了 `ref={langMenuRef}` 的绑定，导致 `handleClickOutside` 的 `langMenuRef.current` 恒为 `null`，事件判定失效。
+- **修复**：为外层包裹容器添加 `ref={langMenuRef}`，使点击外部与 ESC 键盘监听均能正确捕获并收起菜单。
+
+### 坑 4：跨组件语言代码识别未兼容 en_us 导致特定场景下语言脱节
+- **现象**：当通过 URL 探测或特定模块向 localStorage 或事件总线写入 `en_us` 时，`BlogSidebar`、`PageHeader` 和 `IntroBio` 依然显示中文。
+- **原因**：部分组件只做了 `code === 'en' || code === 'en-US'` 判定，当遇到 `en_us` 时判定失败回退为 `zh`。
+- **修复**：在各组件的语言识别逻辑中全面统一增加 `en_us` 兼容判断（`saved === 'en' || saved === 'en_us' || saved === 'en-US'`）。
