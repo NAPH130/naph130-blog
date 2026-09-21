@@ -1,8 +1,14 @@
-name: Deploy to GitHub Pages
+name: CI & Deploy
 
 on:
   push:
-    branches: [main, develop, dev]
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
   workflow_dispatch:
 
 permissions:
@@ -16,43 +22,46 @@ concurrency:
 
 jobs:
   build:
+    name: Build & Check
     runs-on: ubuntu-latest
     steps:
-      - name: 检出代码
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: 安装 pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: 安装 Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      - name: 安装依赖
-        run: pnpm install
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
 
-      - name: 生成文章 Meta
-        run: pnpm generate-meta
-
-      - name: 构建
+      - name: Build & Type Check
         run: pnpm build
 
-      - name: 上传构建产物
+      - name: Upload Pages Artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
+    name: Deploy to GitHub Pages
     needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: 部署至 GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

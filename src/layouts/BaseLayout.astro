@@ -1,0 +1,149 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
+import bgImage from '@/assets/background.jpg';
+import HeaderNav from '@/components/HeaderNav';
+import { siteConfig } from '@/site.config';
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  currentPath?: string;
+  lang?: string;
+}
+
+const {
+  title = siteConfig.title,
+  currentPath = '/',
+  lang = 'zh-CN',
+} = Astro.props;
+
+const optimizedBg = await getImage({ src: bgImage });
+---
+
+<!doctype html>
+<html lang={lang} class="h-full overflow-hidden">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    
+    <!-- 预连接与极速预载字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Outfit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@700;800&family=Quicksand:wght@700&display=swap"
+      rel="stylesheet"
+    />
+
+    <ClientRouter />
+
+    <!-- 预先从 localStorage 注入用户自定义磨砂变量及页面初始状态变量 -->
+    <script is:inline>
+      (function () {
+        try {
+          const root = document.documentElement;
+          const isHome = window.location.pathname === '/' || window.location.pathname === '';
+          const saved = localStorage.getItem('naph130_page_settings');
+          
+          let blur = '40px';
+          let bg = 'rgba(255, 255, 255, 0.28)';
+          let opacity = '1';
+
+          if (saved) {
+            const data = JSON.parse(saved);
+            const fg = data.frostedGlass;
+            if (fg) {
+              if (fg.enabled === false) {
+                blur = '0px';
+                bg = 'transparent';
+                opacity = '0';
+              } else {
+                blur = (fg.blur ?? 40) + 'px';
+                opacity = '1';
+                bg = 'rgba(255, 255, 255, 0.28)';
+              }
+            }
+          }
+
+          root.style.setProperty('--glass-blur', blur);
+          root.style.setProperty('--glass-bg', bg);
+          root.style.setProperty('--glass-opacity', opacity);
+
+          // 页面当前动态生效状态变量（跨页面平滑插值）
+          if (isHome) {
+            root.style.setProperty('--page-blur', '0px');
+            root.style.setProperty('--page-bg', 'transparent');
+            root.style.setProperty('--page-opacity', '0');
+          } else {
+            root.style.setProperty('--page-blur', blur);
+            root.style.setProperty('--page-bg', bg);
+            root.style.setProperty('--page-opacity', opacity);
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="relative h-screen w-full m-0 p-0 overflow-hidden select-none">
+    <!-- 0层：固定背景壁纸 -->
+    <div
+      transition:persist="site-background"
+      class="fixed inset-0 z-[0] bg-cover bg-center bg-no-repeat pointer-events-none"
+      style={`background-image: url('${optimizedBg.src}')`}
+      aria-hidden="true"
+    />
+
+    <!-- 1层：常驻持久化磨砂玻璃层 -->
+    <div
+      transition:persist="site-frosted-overlay"
+      id="frosted-glass-overlay"
+      class="fixed inset-0 z-[1] pointer-events-none frosted-glass-overlay"
+      style={{
+        backdropFilter: 'blur(var(--page-blur, 0px))',
+        WebkitBackdropFilter: 'blur(var(--page-blur, 0px))',
+        backgroundColor: 'var(--page-bg, transparent)',
+        opacity: 'var(--page-opacity, 0)',
+      }}
+      aria-hidden="true"
+    />
+
+    <!-- 路由生命周期事件调度脚本 -->
+    <script is:inline>
+      function syncPageOverlay() {
+        const path = window.location.pathname.replace(/\/$/, '') || '/';
+        const isHome = path === '/' || path === '';
+        const root = document.documentElement;
+
+        if (isHome) {
+          root.style.setProperty('--page-blur', '0px');
+          root.style.setProperty('--page-bg', 'transparent');
+          root.style.setProperty('--page-opacity', '0');
+        } else {
+          const blur = root.style.getPropertyValue('--glass-blur') || '40px';
+          const bg = root.style.getPropertyValue('--glass-bg') || 'rgba(255, 255, 255, 0.28)';
+          const opacity = root.style.getPropertyValue('--glass-opacity') || '1';
+
+          root.style.setProperty('--page-blur', blur);
+          root.style.setProperty('--page-bg', bg);
+          root.style.setProperty('--page-opacity', opacity);
+        }
+      }
+
+      document.addEventListener('astro:page-load', syncPageOverlay);
+    </script>
+
+    <!-- 50层：顶部导航栏 -->
+    <div
+      transition:persist="site-header-nav"
+      class="fixed top-0 left-0 right-0 z-50 pointer-events-auto"
+    >
+      <HeaderNav currentPath={currentPath} client:load />
+    </div>
+
+    <!-- 10层：页面主体容器 (严格单屏高度，从顶部 h-20 算起，无溢出) -->
+    <main class="relative z-[10] w-full h-screen pt-20 pb-3 box-border overflow-hidden flex flex-col min-h-0">
+      <slot />
+    </main>
+  </body>
+</html>

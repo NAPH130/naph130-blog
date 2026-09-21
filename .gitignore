@@ -1,47 +1,72 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
 # Dependencies
-node_modules/
-.pnpm-store/
+node_modules
+.pnp
+.pnp.js
 
-# Build
-dist/
-dist-ssr/
+# Build Outputs
+dist
+dist-ssr
+build
+out
+.output
+*.local
+.astro/
 
-# TypeScript compiled output
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Testing & Coverage
+coverage
+*.lcov
+.nyc_output
+playwright-report
+test-results
+
+# Cache & Temporary Files
+.cache
+.turbo
+.parcel-cache
+.eslintcache
+.stylelintcache
+.prettiercache
 *.tsbuildinfo
-vite.config.d.ts
-vite.config.js
-tailwind.config.d.ts
-tailwind.config.js
-scripts/*.d.ts
-scripts/*.js
+.temp
+.tmp
 
-# IDE
+# Editor & IDE
+.idea
 .vscode/*
 !.vscode/extensions.json
-.idea/
+!.vscode/settings.json
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.sublime-workspace
+*.sublime-project
 
-# OS
+# OS Metadata
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Env
-.env
-.env.local
-.env.*.local
-
-# Logs
-*.log
-npm-debug.log*
-pnpm-debug.log*
-
-# Opencode
-.agents/
-skills-lock.json
-
-# Misc
-*.local
+# Agent / Local Workspace
+.agent/
