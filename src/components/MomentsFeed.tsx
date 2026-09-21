@@ -112,18 +112,15 @@ export const MomentLightbox: React.FC<MomentLightboxProps> = ({
       className="fixed inset-0 z-[99999] bg-black/35 backdrop-blur-md flex items-center justify-center p-2 sm:p-5 select-none animate-in fade-in duration-200"
       onClick={onClose}
     >
-      {/* 居中大尺寸浅色半透明晶透磨砂玻璃圆角悬浮窗容器 */}
+      {/* 居中大尺寸纯磨砂背景圆角悬浮窗容器 (无玻璃内高光与反光线，仅纯净磨砂模糊) */}
       <div
-        className="relative w-[96vw] max-w-[1380px] h-[92vh] sm:h-[94vh] flex flex-col rounded-3xl bg-white/45 dark:bg-white/35 backdrop-blur-3xl backdrop-saturate-150 border border-white/70 shadow-[0_30px_90px_rgba(0,0,0,0.2),inset_0_1px_2.5px_rgba(255,255,255,0.95)] overflow-hidden animate-in zoom-in-95 duration-200"
+        className="relative w-[96vw] max-w-[1380px] h-[92vh] sm:h-[94vh] flex flex-col rounded-3xl bg-white/30 dark:bg-white/20 backdrop-blur-3xl border border-white/30 shadow-[0_30px_90px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 顶部晶透微高光反光镜面 */}
-        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none z-30" />
-
         {/* 悬浮窗顶栏（无任何横向分割线，浑然一体） */}
         <div className="relative h-12 sm:h-14 px-4 sm:px-6 flex items-center justify-end select-none shrink-0 z-20">
           {/* 居中计数指示胶囊 */}
-          <div className="absolute left-1/2 -translate-x-1/2 font-mono text-xs sm:text-sm tracking-wider px-3.5 py-1 rounded-full bg-white/65 dark:bg-white/55 backdrop-blur-xl border border-white/80 text-neutral-800 dark:text-neutral-900 font-semibold shadow-xs pointer-events-none">
+          <div className="absolute left-1/2 -translate-x-1/2 font-mono text-xs sm:text-sm tracking-wider px-3.5 py-1 rounded-full bg-white/40 dark:bg-white/25 backdrop-blur-xl border border-white/40 text-neutral-800 dark:text-neutral-200 font-medium shadow-xs pointer-events-none">
             {index + 1} / {total}
           </div>
 
@@ -132,7 +129,7 @@ export const MomentLightbox: React.FC<MomentLightboxProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close preview"
-            className="w-9 h-9 rounded-full bg-white/60 hover:bg-white/90 active:scale-95 text-neutral-700 hover:text-neutral-950 flex items-center justify-center transition-all cursor-pointer border border-white/80 shadow-xs hover:shadow-md"
+            className="w-9 h-9 rounded-full bg-white/40 hover:bg-white/65 active:scale-95 text-neutral-700 hover:text-neutral-950 flex items-center justify-center transition-all cursor-pointer border border-white/40 shadow-xs hover:shadow-md"
             title="关闭 (Esc)"
           >
             <X className="w-4 h-4" />
@@ -145,7 +142,7 @@ export const MomentLightbox: React.FC<MomentLightboxProps> = ({
           <img
             src={images[index]}
             alt={`Preview image ${index + 1}`}
-            className="max-w-[92vw] max-h-[80vh] sm:max-h-[84vh] w-auto h-auto object-contain rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.22),0_4px_12px_rgba(0,0,0,0.08)] border border-white/60 pointer-events-auto select-none transition-all duration-300"
+            className="max-w-[92vw] max-h-[80vh] sm:max-h-[84vh] w-auto h-auto object-contain rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-white/25 pointer-events-auto select-none transition-all duration-300"
           />
 
           {/* 左右悬浮翻页大圆钮 */}
@@ -155,7 +152,7 @@ export const MomentLightbox: React.FC<MomentLightboxProps> = ({
                 type="button"
                 onClick={handlePrev}
                 aria-label="Previous image"
-                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/70 hover:bg-white/95 active:scale-90 text-neutral-800 hover:text-neutral-950 backdrop-blur-xl flex items-center justify-center border border-white/80 shadow-lg cursor-pointer transition-all hover:scale-105"
+                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/40 hover:bg-white/65 active:scale-90 text-neutral-800 hover:text-neutral-950 backdrop-blur-xl flex items-center justify-center border border-white/40 shadow-lg cursor-pointer transition-all hover:scale-105"
                 title="上一张 (←)"
               >
                 <ChevronLeft className="w-6 h-6" />
@@ -164,7 +161,7 @@ export const MomentLightbox: React.FC<MomentLightboxProps> = ({
                 type="button"
                 onClick={handleNext}
                 aria-label="Next image"
-                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/70 hover:bg-white/95 active:scale-90 text-neutral-800 hover:text-neutral-950 backdrop-blur-xl flex items-center justify-center border border-white/80 shadow-lg cursor-pointer transition-all hover:scale-105"
+                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/40 hover:bg-white/65 active:scale-90 text-neutral-800 hover:text-neutral-950 backdrop-blur-xl flex items-center justify-center border border-white/40 shadow-lg cursor-pointer transition-all hover:scale-105"
                 title="下一张 (→)"
               >
                 <ChevronRight className="w-6 h-6" />
@@ -457,26 +454,28 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
             </>
           )}
 
-          {/* 左右切换箭头按钮 (PC 悬浮展示) */}
+          {/* 左右切换箭头按钮 (优雅白透磨砂圆盘，悬浮时平滑微滑入并放大) */}
           <button
             type="button"
             onClick={handlePrev}
             aria-label="Previous image"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-7 h-7 rounded-none bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-200 active:scale-90 shadow-md cursor-pointer border border-white/20"
+            className="absolute left-2.5 sm:left-3.5 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/65 hover:bg-white/90 active:scale-90 text-neutral-800 hover:text-neutral-950 backdrop-blur-xl flex items-center justify-center opacity-0 -translate-x-1.5 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-250 ease-out shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] cursor-pointer border border-white/80 hover:scale-105"
+            title="上一张 (←)"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5 sm:w-5 sm:h-5 transition-transform duration-200 group-hover/carousel:-translate-x-0.5" />
           </button>
           <button
             type="button"
             onClick={handleNext}
             aria-label="Next image"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-7 h-7 rounded-none bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-200 active:scale-90 shadow-md cursor-pointer border border-white/20"
+            className="absolute right-2.5 sm:right-3.5 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/65 hover:bg-white/90 active:scale-90 text-neutral-800 hover:text-neutral-950 backdrop-blur-xl flex items-center justify-center opacity-0 translate-x-1.5 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 transition-all duration-250 ease-out shadow-[0_4px_14px_rgba(0,0,0,0.12)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] cursor-pointer border border-white/80 hover:scale-105"
+            title="下一张 (→)"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5 sm:w-5 sm:h-5 transition-transform duration-200 group-hover/carousel:translate-x-0.5" />
           </button>
 
           {/* 悬浮角标 (例如 1/8) */}
-          <div className="absolute top-2 right-2 z-30 px-1.5 py-0.5 rounded-none bg-black/45 backdrop-blur-md border border-white/20 text-white/95 text-[10px] font-mono tracking-wider shadow-xs pointer-events-none">
+          <div className="absolute top-2.5 right-2.5 z-30 px-2 py-0.5 rounded-full bg-white/60 dark:bg-white/45 backdrop-blur-md border border-white/70 text-neutral-800 dark:text-neutral-900 text-[10px] font-mono font-semibold tracking-wider shadow-xs pointer-events-none">
             {currentIndex + 1}/{total}
           </div>
         </div>
@@ -740,8 +739,6 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
                                         key={moment.id}
                                         className="moment-card group/card relative rounded-2xl p-4 sm:p-5 flex flex-col justify-between overflow-hidden"
                                       >
-                                        {/* 顶部微高光反射线 */}
-                                        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none" />
 
                                         {/* 图片在文字上方显示（小红书同款单图轮播与最多7个居中圆点） */}
                                         {moment.images && moment.images.length > 0 && (

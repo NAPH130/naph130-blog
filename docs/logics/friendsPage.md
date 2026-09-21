@@ -31,16 +31,18 @@
 - **安全呼吸边界**：水平边界裕量 $\text{BOUNDARY\_MARGIN\_X} = 76\text{px}$，顶部裕量 $\text{BOUNDARY\_MARGIN\_TOP} = 56\text{px}$，底部预留 ID 胶囊空间 $\text{BOUNDARY\_MARGIN\_BOTTOM} = 96\text{px}$，确保漫游节点与下方 ID 文本永远不触底、不贴边、不产生切模破损。
 
 1. **边界碰撞检测与镜面反弹 (Wall Bouncing)**：
-   x \le R \implies x = R, \quad v_x = |v_x|
+   在容器尺寸 $W \times H$ 与边界安全裕量约束下：
+   $$
+   x \le \text{margin}_x \implies x = \text{margin}_x, \quad v_x = |v_x|
    $$
    $$
-   x \ge W - R \implies x = W - R, \quad v_x = -|v_x|
+   x \ge W - \text{margin}_x \implies x = W - \text{margin}_x, \quad v_x = -|v_x|
    $$
    $$
-   y \le R \implies y = R, \quad v_y = |v_y|
+   y \le \text{margin}_{\text{top}} \implies y = \text{margin}_{\text{top}}, \quad v_y = |v_y|
    $$
    $$
-   y \ge H - R \implies y = H - R, \quad v_y = -|v_y|
+   y \ge H - \text{margin}_{\text{bottom}} \implies y = H - \text{margin}_{\text{bottom}}, \quad v_y = -|v_y|
    $$
 2. **两两球体完全弹性碰撞与动量冲量守恒 (Sphere-to-Sphere Collision)**：
    对于任意两球 $A(x_1, y_1, \mathbf{v}_1)$ 与 $B(x_2, y_2, \mathbf{v}_2)$，当球心欧式距离 $d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} < R_1 + R_2$ 时触发碰撞：
@@ -58,7 +60,7 @@
    - 通过 `requestAnimationFrame` 直接修改节点的 `style.transform = translate3d(...)`，实现流畅的 60 FPS 物理漫游与最低的 CPU 占用。
 
 ### 1.3 悬停锁止与极简探针卡片 (Frosted HUD Inspector)
-1. **头像下方 ID 标识常驻**：每个漫游的圆形头像正下方挂载等宽半透明微胶囊，直观显示其 `friend.id`（如 `anthony-fu`、`antigravity`），安全边距动态扩展（`BOUNDARY_MARGIN_BOTTOM = 70px`）确保文本永不触底或溢出；
+1. **头像下方 ID 标识常驻**：每个漫游的圆形头像正下方挂载等宽半透明微胶囊，直观显示其 `friend.id`（如 `anthony-fu`、`antigravity`），安全边距动态扩展（`BOUNDARY_MARGIN_BOTTOM = 96px`）确保文本永不触底或溢出；
 2. **极简检视卡片架构 (Pure Minimalist HUD)**：
    - 严格剔除类别徽章、冗余 URL 文本、散落标签群及复制按钮等非必要视觉噪声；
    - 仅包含三项核心信息：
@@ -91,7 +93,7 @@
 - **原因**：此前的物理循环将边框反弹计算置于球体碰撞计算之前。当 Step 2 钳制在边框内后，Step 3 的球体反向分离（Positional Separation）强行施加了位移并将坐标推至安全边界之外，随后直接同步至 DOM Transform。
 - **修复**：
   1. 将边框检测与钳制严格置于球体碰撞分离**之后**执行；
-  2. 引入充足的边界安全裕量（`BOUNDARY_MARGIN = 44px`），使 64px 头像在放大、描边与外阴影下与容器外框始终保持至少 12px 的呼吸间隙，彻底杜绝边界溢出。
+  2. 引入充足的边界安全裕量（`BOUNDARY_MARGIN_X = 76px`, `BOUNDARY_MARGIN_TOP = 56px`, `BOUNDARY_MARGIN_BOTTOM = 96px`），使 96px 头像在描边与下方 ID 标签空间下与容器外框始终保持安全呼吸间隙，彻底杜绝边界溢出。
 
 ### 坑 5：ClientRouter 切换切入友链页时 Flexbox min-height/width: auto 导致的“头像变成椭圆畸形”
 - **现象**：从首页、文章页或动态页通过顶部导航切入友链页时，部分圆形头像变成了扁平或拉长的椭圆形畸形。

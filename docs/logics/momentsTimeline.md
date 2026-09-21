@@ -131,14 +131,14 @@ export function resolveMomentImages(locale: string, images?: string[]): string[]
    - 彻底摆脱 `.moment-card` 父容器的 `backdrop-filter` 与 `overflow-hidden` 包含块限制；
    - 通过 `createPortal(..., document.body)` 脱离局部 DOM 树，成为全视口独立顶级浮层；
    - **大尺寸剧场级视口**：容器尺寸大幅扩展至 `w-[96vw] max-w-[1380px] h-[92vh] sm:h-[94vh]`，图片展现范围扩展至 `max-w-[92vw] max-h-[76vh] sm:max-h-[80vh]`；
-   - **浅色半透明磨砂玻璃圆角设计语言**：
-     - 悬浮窗外壳采用浅色半透明高饱和磨砂质感：`rounded-3xl bg-white/45 dark:bg-white/35 backdrop-blur-3xl backdrop-saturate-150 border border-white/70 shadow-[0_30px_90px_rgba(0,0,0,0.2),inset_0_1px_2.5px_rgba(255,255,255,0.95)]`；
-     - 顶部保留极细微高光反光晶面（`h-[1px] bg-gradient-to-r from-transparent via-white/90 to-transparent`）；
+   - **纯磨砂背景圆角设计语言 (Pure Frosted Backdrop - 无玻璃效果)**：
+     - 悬浮窗外壳采用纯净磨砂质感：`rounded-3xl bg-white/30 dark:bg-white/20 backdrop-blur-3xl border border-white/30 shadow-[0_30px_90px_rgba(0,0,0,0.2)]`；
+     - **彻底剥离玻璃效果**：去除顶部镜面高光反射线、去除玻璃倒角内反射阴影（`inset 0 1px...`）、去除人工色彩饱和度加成（`backdrop-saturate-150`），纯粹依赖自然高斯模糊与半透明白质底色；
      - **彻底移除顶部分割线**：顶栏与画布融为一体（无 `border-b`），消除硬生生截断感；
-     - 居中绝对定位计数胶囊：采用通透白晶磨砂小胶囊（`absolute left-1/2 -translate-x-1/2 rounded-full bg-white/65 border border-white/80 text-neutral-800`）；
-     - 右侧圆形磨砂关闭按钮（`w-9 h-9 rounded-full bg-white/60 hover:bg-white/90 border border-white/80 text-neutral-700`）；
-     - 画布彻底去除黑底遮罩（`bg-transparent`），图片带轻度圆角与深邃投影（`rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.22)] border border-white/60`）；
-     - 两侧浮现大圆形透亮磨砂翻页按钮（`w-12 h-12 rounded-full bg-white/70 hover:bg-white/95 border border-white/80 text-neutral-800`），支持键盘左右箭头与点击快捷翻页。
+     - 居中绝对定位计数胶囊：采用纯磨砂小胶囊（`absolute left-1/2 -translate-x-1/2 rounded-full bg-white/40 border border-white/40 text-neutral-800`）；
+     - 右侧圆形磨砂关闭按钮（`w-9 h-9 rounded-full bg-white/40 hover:bg-white/65 border border-white/40 text-neutral-700`）；
+     - 画布彻底去除黑底遮罩（`bg-transparent`），图片带轻度圆角与柔和投影（`rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-white/25`）；
+     - 两侧浮现大圆形纯磨砂翻页按钮（`w-12 h-12 rounded-full bg-white/40 hover:bg-white/65 border border-white/40 text-neutral-800`），支持键盘左右箭头与点击快捷翻页。
 
 #### 1.4.2 竖图（9:16、3:4、1:2）与全比例自适应解法
 常规横向轮播对竖图使用 `object-cover` 会导致头部与脚部被暴力裁切超 60%~70%。针对这一痛点，组件引入了**画幅感知与双层渲染引擎**：
@@ -170,6 +170,11 @@ graph LR
 #### 1.4.4 小红书同款严格居中 7 颗圆点指示器
 在格栅视口下方，继续挂载三槽位绝对居中指示器（`flex-1` 左对齐 + `shrink-0` 中心高亮点 + `flex-1` 右对齐），即使处于首尾非对称状态（如第 1 张图），高亮圆点也稳固锚定在 50% 几何水平中心线上，离中心越远的点尺寸与透明度逐级衰减。
 
+
+#### 1.4.5 白透磨砂圆盘翻页按钮与角标优化 (`MomentCarousel` Navigation Controls)
+- **彻底替换生硬黑方块**：将原本粗糙生硬的黑底方块小按钮（`w-7 h-7 rounded-none bg-black/40`）重构为白透晶莹的悬浮磨砂圆盘（`w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/65 hover:bg-white/90 border border-white/80 shadow-[0_4px_14px_rgba(0,0,0,0.12)]`）；
+- **微平移滑入交互**：PC 端鼠标悬停在轮播容器时，左右按钮伴随 `translate-x` 轻微从边缘向内滑入并淡入展现，箭头图标向外轻微偏移动效，点击具备 `active:scale-90` 弹性机械触感反馈；
+- **右上角页码胶囊同步升级**：将原黑底直角胶囊升级为柔和白透等宽磨砂微胶囊（`rounded-full bg-white/60 border border-white/70 text-neutral-800 text-[10px] font-mono`），彻底消除黑色色块对画面的突兀割裂。
 ---
 
 ### 1.5 顶部年份快速索引切换器
@@ -196,19 +201,18 @@ graph LR
 
 ---
 
-### 1.7 极简晶透磨砂卡片设计 (`.moment-card`)
+### 1.7 极简纯磨砂卡片设计 (`.moment-card` - 纯磨砂背景，无玻璃效果)
 
-卡片完全纳入整站**晶透磨砂玻璃（Frosted Glass）**体系，信息架构自上而下自然流淌：
+卡片完全剥离任何玻璃反光线条与高光倒角，采用**纯磨砂背景（Pure Frosted Backdrop）**体系，信息架构自上而下自然流淌：
 
 | 构件区域 | 布局与样式 | 视觉目标与设计权衡 |
 | :--- | :--- | :--- |
-| **顶部高光线** | `h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent` | 物理倒角镜面反光质感 |
+| **卡片底座** | `bg-white/20 backdrop-blur-24px border-white/30 shadow-md` | **无玻璃效果**：彻底去除顶部微高光反光线、去除 `saturate` 人工饱和度加深、去除 `inset 0 1px...` 内高光倒角，纯净自然 |
 | **三图格栅展示区** | 位于正文上方，画幅自适应，`rounded-none` | 一次展示 3 张，竖图完整不截断，左右半透微模糊遮挡；点击主图唤起全局悬浮窗 |
 | **指示器** | 居中三槽位最多 7 颗圆点 | 精致滑动反馈，高亮点绝对居中 |
 | **正文文字** | `text-[14px] sm:text-[14.5px] leading-relaxed text-neutral-800` | 高对比度舒适排版，支持行内代码高亮与自动识别超链接 |
 | **右下角时间** | `mt-2.5 pt-1 flex items-center justify-end font-mono text-xs text-neutral-500` | **删除时间 Emoji/时钟图标**，纯文本等宽排版，无视觉喧宾夺主，平稳收底 |
 | **博主信息** | 完全移除头像与 ID | 消除单人博客每张卡片机械重复展示个人信息的冗余噪声 |
-
 ---
 
 ## 2. 踩坑点与 Bug 修复记录
