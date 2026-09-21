@@ -125,7 +125,7 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
         {/* 圆形头像 */}
         <div className="mx-auto w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-full border-2 border-white/80 shadow-sm overflow-hidden relative group">
           <img
-            src="/avatar.jpg"
+            src={`${(import.meta.env.BASE_URL || '/').replace(/\/$/, '')}/avatar.jpg`}
             alt="NAPH130"
             className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {

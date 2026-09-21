@@ -7,6 +7,8 @@ import rehypeKatex from 'rehype-katex';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://naph130.github.io',
+  base: '/naph130-blog',
   server: {
     host: true,
     port: 4321,

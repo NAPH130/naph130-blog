@@ -51,14 +51,15 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
       window.dispatchEvent(new CustomEvent('naph130:lang-change', { detail: name }));
 
       // 若当前正处于分语言文章详情页 (/posts/[locale]/[slug])，平滑切换至目标语言对应文章路由
+      const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
       const path = window.location.pathname;
-      const match = path.match(/^\/posts\/(zh_cn|en_us)\/(.+)$/);
+      const match = path.match(/(?:.*\/)?posts\/(zh_cn|en_us)\/(.+)$/);
       if (match) {
         const currentLocaleInUrl = match[1];
         const postSlug = match[2];
         const targetLocaleInUrl = name === 'en' || name === 'en_us' ? 'en_us' : 'zh_cn';
         if (currentLocaleInUrl !== targetLocaleInUrl) {
-          window.location.href = `/posts/${targetLocaleInUrl}/${postSlug}`;
+          window.location.href = `${base}/posts/${targetLocaleInUrl}/${postSlug}`;
         }
       }
     }
@@ -143,15 +144,15 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
   };
 
   const targetLocale = currentLang === 'en' || currentLang === 'en_us' ? 'en_us' : 'zh_cn';
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 
   const navItems = [
-    { key: 'home', href: '/', icon: Home },
-    { key: 'intro', href: '/intro', icon: User },
-    { key: 'posts', href: '/posts', icon: BookOpen },
-    { key: 'moments', href: '/moments', icon: Sparkles },
-    { key: 'friends', href: '/friends', icon: Link2 },
+    { key: 'home', href: `${base}/`, icon: Home },
+    { key: 'intro', href: `${base}/intro`, icon: User },
+    { key: 'posts', href: `${base}/posts`, icon: BookOpen },
+    { key: 'moments', href: `${base}/moments`, icon: Sparkles },
+    { key: 'friends', href: `${base}/friends`, icon: Link2 },
   ];
-
   return (
     <>
       {/* 顶部透明悬浮 Bar */}
@@ -160,7 +161,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
           {/* 左侧：纯白 Logo */}
           <div className="flex items-center shrink-0 z-10 min-w-[220px]">
             <a
-              href="/"
+              href={`${base}/`}
               className="flex items-center text-xl sm:text-2xl font-['Comfortaa'] font-bold tracking-normal text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] hover:opacity-90 transition-opacity whitespace-nowrap"
             >
               <span className="whitespace-nowrap">NAPH130's Blog</span>
@@ -171,11 +172,10 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
           <nav className="absolute left-1/2 -translate-x-1/2 inset-y-0 flex items-center justify-center gap-6 sm:gap-9 md:gap-10 shrink-0 z-20 pointer-events-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive =
-                item.href === '/'
-                  ? activePath === '/'
-                  : activePath === item.href || activePath.startsWith(item.href + '/');
-
+              const isHome = item.key === 'home';
+              const isActive = isHome
+                ? activePath === base || activePath === `${base}/` || activePath === '/' || activePath === ''
+                : activePath === item.href || activePath.startsWith(`${item.href}/`);
               return (
                 <a
                   key={item.href}

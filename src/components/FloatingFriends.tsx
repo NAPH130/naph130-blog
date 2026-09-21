@@ -24,6 +24,14 @@ const BOUNDARY_MARGIN_X = 76; // 半宽 70px + 6px 安全边距
 const BOUNDARY_MARGIN_TOP = 56; // 半径 48px + 8px
 const BOUNDARY_MARGIN_BOTTOM = 96; // 半径 48px + 标签 30px + 18px 底部缓冲
 const COLLISION_DISTANCE = 100; // 48 * 2 + 4px 弹性碰撞缓冲间距
+const resolveAvatar = (url?: string) => {
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+  if (!url) return `${base}/avatar.jpg`;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith(base)) return url;
+  return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 
 export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
   friendsByLocale,
@@ -401,7 +409,7 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
             >
               {friend.avatar ? (
                 <img
-                  src={friend.avatar}
+                  src={resolveAvatar(friend.avatar)}
                   alt={friend.id}
                   width="96"
                   height="96"
@@ -475,8 +483,7 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
           <div className="flex items-center gap-2.5 pb-2.5 border-b border-white/30">
             <div className="w-8 h-8 rounded-lg overflow-hidden border border-white/80 shadow-xs shrink-0 bg-white/30">
               <img
-                src={activeHud.friend.avatar || '/avatar.jpg'}
-                alt={activeHud.friend.id}
+                src={resolveAvatar(activeHud.friend.avatar)}
                 className="w-full h-full object-cover"
               />
             </div>

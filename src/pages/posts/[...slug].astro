@@ -60,7 +60,7 @@ const readingTimeText = isEnglish ? `~${readingTime} min read` : `约${readingTi
           <div class="sticky top-2 sm:top-3 z-30 pointer-events-none h-0">
             <div class="inline-block pointer-events-auto pl-4 sm:pl-6 pt-3 sm:pt-4">
               <a
-                href="/posts"
+                href={`${import.meta.env.BASE_URL}posts`}
                 class="frosted-glass-back-btn inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full font-medium text-xs sm:text-sm select-none cursor-pointer group"
                 aria-label={backText}
               >
