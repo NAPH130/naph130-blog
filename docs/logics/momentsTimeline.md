@@ -205,8 +205,8 @@ graph LR
 
 卡片完全剥离任何玻璃反光线条与高光倒角，采用**纯磨砂背景（Pure Frosted Backdrop）**体系，信息架构自上而下自然流淌：
 
-| 构件区域 | 布局与样式 | 视觉目标与设计权衡 |
-| :--- | :--- | :--- |
+| **正文文字** | `text-[16px] sm:text-[17px] leading-relaxed text-neutral-800` | 加大字号舒适排版，行距舒展，提升中大屏幕上的阅读舒适度与视觉聚焦感 |
+| **右下角时间** | `mt-2.5 pt-1 flex items-center justify-end font-mono text-xs sm:text-[13px] text-neutral-500` | 纯文本等宽排版，无视觉喧宾夺主，平稳收底 |
 | **卡片底座** | `bg-white/20 backdrop-blur-24px border-white/30 shadow-md` | **无玻璃效果**：彻底去除顶部微高光反光线、去除 `saturate` 人工饱和度加深、去除 `inset 0 1px...` 内高光倒角，纯净自然 |
 | **三图格栅展示区** | 位于正文上方，画幅自适应，`rounded-none` | 一次展示 3 张，竖图完整不截断，左右半透微模糊遮挡；点击主图唤起全局悬浮窗 |
 | **指示器** | 居中三槽位最多 7 颗圆点 | 精致滑动反馈，高亮点绝对居中 |

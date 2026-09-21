@@ -29,7 +29,7 @@ function renderFormattedContent(text: string) {
       return (
         <code
           key={idx}
-          className="mx-1 px-1.5 py-0.5 rounded-md bg-neutral-900/[0.07] text-sky-800 font-mono text-[13px] border border-neutral-900/10 select-text"
+          className="mx-1 px-1.5 py-0.5 rounded-md bg-neutral-900/[0.07] text-sky-800 font-mono text-[14.5px] sm:text-[15.5px] border border-neutral-900/10 select-text"
         >
           {code}
         </code>
@@ -475,7 +475,7 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
           </button>
 
           {/* 悬浮角标 (例如 1/8) */}
-          <div className="absolute top-2.5 right-2.5 z-30 px-2 py-0.5 rounded-full bg-white/60 dark:bg-white/45 backdrop-blur-md border border-white/70 text-neutral-800 dark:text-neutral-900 text-[10px] font-mono font-semibold tracking-wider shadow-xs pointer-events-none">
+          <div className="absolute top-2.5 right-2.5 z-30 px-2 py-0.5 rounded-full bg-white/60 dark:bg-white/45 backdrop-blur-md border border-white/70 text-neutral-800 dark:text-neutral-900 text-xs font-mono font-semibold tracking-wider shadow-xs pointer-events-none">
             {currentIndex + 1}/{total}
           </div>
         </div>
@@ -606,7 +606,7 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
             <button
               type="button"
               onClick={() => setSelectedYear('all')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-['Comfortaa'] text-xs font-bold transition-all duration-300 ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-['Comfortaa'] text-xs sm:text-sm font-bold transition-all duration-300 ${
                 selectedYear === 'all'
                   ? 'bg-neutral-900 text-white shadow-xs scale-[1.02]'
                   : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/30'
@@ -615,7 +615,7 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
               <Layers className="w-3.5 h-3.5" />
               <span>{isEn ? 'All' : '全部'}</span>
               <span
-                className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                className={`text-xs font-mono px-1.5 py-0.2 rounded-full ${
                   selectedYear === 'all'
                     ? 'bg-white/20 text-white'
                     : 'bg-black/5 text-neutral-600'
@@ -632,7 +632,7 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
                   key={item.year}
                   type="button"
                   onClick={() => setSelectedYear(item.year)}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-['Comfortaa'] text-xs font-bold transition-all duration-300 ${
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-['Comfortaa'] text-xs sm:text-sm font-bold transition-all duration-300 ${
                     active
                       ? 'bg-neutral-900 text-white shadow-xs scale-[1.02]'
                       : 'text-neutral-700 hover:text-neutral-950 hover:bg-white/30'
@@ -640,7 +640,7 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
                 >
                   <span>{item.yearStr}</span>
                   <span
-                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                    className={`text-xs font-mono px-1.5 py-0.2 rounded-full ${
                       active ? 'bg-white/20 text-white' : 'bg-black/5 text-neutral-600'
                     }`}
                   >
@@ -701,8 +701,8 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
                           {/* 月份水平连接微引线 */}
                           <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-4 h-[1px] bg-sky-400/30" />
 
-                          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/60 backdrop-blur-md border border-white/80 shadow-2xs text-neutral-800 font-['Comfortaa'] font-bold text-xs tracking-wide">
-                            <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/60 backdrop-blur-md border border-white/80 shadow-2xs text-neutral-800 font-['Comfortaa'] font-bold text-xs sm:text-sm tracking-wide">
+                            <Calendar className="w-4 h-4 text-sky-600" />
                             <span>{monthGroup.monthStr}</span>
                           </div>
                         </div>
@@ -724,8 +724,8 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
                                   <div className="absolute -left-4 top-[18px] w-4 h-[1px] bg-sky-400/40 group-hover/day:bg-sky-400/80 group-hover/day:shadow-[0_0_6px_rgba(56,189,248,0.5)] transition-all duration-300" />
 
                                   {/* 日期徽章胶囊（纯数字日期，触控悬浮联动） */}
-                                  <div className="w-9 h-8 sm:w-10 sm:h-8 rounded-xl bg-white/65 backdrop-blur-md border border-white/80 shadow-2xs flex items-center justify-center text-neutral-800 group-hover/day:border-sky-300 group-hover/day:bg-white/90 group-hover/day:text-sky-950 group-hover/day:scale-105 group-hover/day:shadow-xs transition-all duration-300">
-                                    <span className="font-mono font-bold text-sm text-neutral-900 leading-none tracking-tight">
+                                  <div className="w-10 h-8 sm:w-11 sm:h-9 rounded-xl bg-white/65 backdrop-blur-md border border-white/80 shadow-2xs flex items-center justify-center text-neutral-800 group-hover/day:border-sky-300 group-hover/day:bg-white/90 group-hover/day:text-sky-950 group-hover/day:scale-105 group-hover/day:shadow-xs transition-all duration-300">
+                                    <span className="font-mono font-bold text-base text-neutral-900 leading-none tracking-tight">
                                       {dayGroup.dayStr}
                                     </span>
                                   </div>
@@ -746,13 +746,13 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
                                         )}
 
                                         {/* 动态正文内容 */}
-                                        <div className="text-[14px] sm:text-[14.5px] leading-relaxed text-neutral-800 font-sans tracking-normal select-text break-words whitespace-pre-wrap">
+                                        <div className="text-[16px] sm:text-[17px] leading-relaxed text-neutral-800 font-sans tracking-normal select-text break-words whitespace-pre-wrap">
                                           {renderFormattedContent(moment.content)}
                                         </div>
 
                                         {/* 右下角时间展示（纯文本等宽排版，无 emoji / 图标） */}
                                         <div className="mt-2.5 pt-1 flex items-center justify-end select-none">
-                                          <span className="text-xs font-mono text-neutral-500 font-medium tracking-tight">
+                                          <span className="text-xs sm:text-[13px] font-mono text-neutral-500 font-medium tracking-tight">
                                             {moment.fullDateStr}
                                           </span>
                                         </div>

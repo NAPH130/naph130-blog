@@ -481,15 +481,16 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
               />
             </div>
             <h3 className="font-mono font-bold text-sm sm:text-base text-neutral-900 dark:text-neutral-900 truncate">
-              {activeHud.friend.id}
+              {activeHud.friend.title || activeHud.friend.id}
             </h3>
           </div>
 
-          {/* 2. 简介 */}
-          <p className="text-xs text-neutral-700 leading-relaxed font-sans line-clamp-3">
-            {activeHud.friend.description}
-          </p>
-
+          {/* 2. 简介（非空时展示） */}
+          {activeHud.friend.description ? (
+            <p className="text-xs text-neutral-700 leading-relaxed font-sans line-clamp-3">
+              {activeHud.friend.description}
+            </p>
+          ) : null}
           {/* 3. “访问”按钮 */}
           <div className="pt-2 border-t border-white/20">
             <a
