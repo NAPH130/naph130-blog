@@ -9,7 +9,7 @@ const { locale = 'zh_cn' } = Astro.props;
 ---
 
 <header
-  class="fixed top-0 left-0 right-0 z-50 h-14 bg-white/45 dark:bg-neutral-900/40 backdrop-blur-md border-b border-white/20 dark:border-white/10 shadow-sm transition-colors duration-300 select-none"
+  class="fixed top-0 left-0 right-0 z-50 h-14 bg-white/45 dark:bg-neutral-900/40 backdrop-blur-md border-b border-white/20 dark:border-white/10 shadow-xs transition-colors duration-300 select-none"
 >
   <div class="max-w-7xl mx-auto h-full px-4 sm:px-8 flex items-center justify-between">
     <!-- 左侧：博客名称 -->
@@ -25,7 +25,7 @@ const { locale = 'zh_cn' } = Astro.props;
     <nav class="flex items-center gap-2">
       <a
         href="/"
-        class="relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium text-sky-600 dark:text-sky-400 bg-sky-500/10 border border-sky-500/20 shadow-sm transition-all hover:bg-sky-500/15"
+        class="relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium text-sky-600 dark:text-sky-400 bg-sky-500/10 border border-sky-500/20 shadow-xs transition-all hover:bg-sky-500/15"
       >
         <!-- 首页图标 -->
         <svg
@@ -44,7 +44,7 @@ const { locale = 'zh_cn' } = Astro.props;
         <span>{t('nav.home', locale)}</span>
         <!-- 激活小蓝点 -->
         <span
-          class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-sky-500 shadow-sm"
+          class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-sky-500 shadow-xs"
           aria-hidden="true"
         ></span>
       </a>
@@ -55,7 +55,7 @@ const { locale = 'zh_cn' } = Astro.props;
       <button
         type="button"
         aria-label="设置"
-        class="p-2 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+        class="p-2 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all focus:outline-hidden focus:ring-2 focus:ring-sky-500/40"
       >
         <!-- 设置齿轮图标 -->
         <svg

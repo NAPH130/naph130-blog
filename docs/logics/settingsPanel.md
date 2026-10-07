@@ -6,6 +6,8 @@
 - `src/components/SettingsModal.tsx`
 - `src/settings/types.ts`
 - `src/settings/registry.ts`
+- `src/settings/items/frostedGlass.ts`
+- `src/layouts/BaseLayout.astro`
 
 ---
 
@@ -25,16 +27,35 @@
 为了保证面板在**首页（0 全局模糊）**与**子页面（40px 全局模糊）**下均具备一致的浅色虚化质感：
 - 面板自身承载独立的背景遮罩与滤镜：
   ```tsx
-  <motion.div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+  <motion.div className="fixed inset-0 bg-black/25 backdrop-blur-xs" />
   ```
 - 面板主体采用浅色高通透纸白磨砂：
   ```tsx
-  className="relative w-[calc(100vw-32px)] sm:w-[400px] max-w-[400px] mx-auto bg-white/90 text-neutral-900 backdrop-blur-2xl border border-neutral-900 rounded-none shadow-2xl"
+  className="relative w-[calc(100vw-32px)] sm:w-[400px] max-w-[400px] mx-auto rounded-none border border-neutral-900/80 text-neutral-900"
+  style={{
+    background: 'rgba(255, 255, 255, 0.45)',
+    backdropFilter: 'blur(32px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(32px) saturate(150%)',
+  }}
   ```
 
 ### 1.3 键盘与无障碍交互
 - 挂载全局 `Escape` 监听，支持随时按键盘 `ESC` 键关闭面板。
 - 路由切换（`astro:page-load`）时自动同步关闭面板，防止跳转后弹窗卡死。
+
+### 1.4 配置更新与磨砂生效链路
+
+```text
+SettingsModal 的开关 / 滑块
+  → HeaderNav.handleUpdateValue() 更新 settings
+  → settings effect: applyAllSettings() + persistSettings()
+  → frostedGlassCategory.apply() 更新六个根节点 CSS 变量
+  → #frosted-glass-overlay 平滑应用模糊、底色和透明度
+```
+
+开关控制的是壁纸磨砂遮罩，面板及卡片自身的模糊保持独立。首页 `/naph130-blog/` 仍按原设计保持清晰；在首页修改参数会保存，并在进入子页面后生效。关闭磨砂后滑块禁用，但保留原强度，重新开启时恢复。
+
+客户端切页不会触发持久化导航组件的 settings effect，因此 `BaseLayout` 独立监听 `astro:after-swap` 重新应用配置。完整生命周期与回归步骤见 [磨砂玻璃逻辑](./frostedGlass.md)。
 
 ---
 
@@ -53,4 +74,9 @@
 ### 坑 3：在首页打开设置面板时磨砂背景“消失”
 - **现象**：在子页面打开面板背景有强虚化，在首页打开面板背景无虚化。
 - **原因**：首页全局壁纸起雾层被配置为 0 模糊，原本模态框自身遮罩层未附加独立模糊。
-- **修复**：在模态框自身的遮罩层加入独立 `backdrop-blur-sm bg-black/40`，保证任何页面环境下背景虚化效果完全自洽。
+- **修复**：在模态框自身的遮罩层加入独立 `backdrop-blur-xs bg-black/25`，保证任何页面环境下背景虚化效果完全自洽。
+
+### 坑 4：开关显示 ON，但客户端切页后的背景无磨砂
+
+- **原因**：布局内联脚本使用未编译的 `import.meta`，路由监听无法注册；ClientRouter 交换根节点属性后，设置变量丢失。
+- **修复**：通过 `define:vars` 注入首次绘制配置，并在布局模块中维护 `before-swap / after-swap` 同步链路。开关、滑块、刷新和切页都走同一设置应用函数。

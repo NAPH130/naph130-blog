@@ -19,14 +19,17 @@
 
 ### 1.2 页面空间布局与动线设计 (内嵌胶囊返回按钮 & 两栏等高栅格)
 文章详情页分为居中正文主体卡片与右侧常驻目录导航栏两大部分：
-1. **内嵌卡片左上角晶透磨砂胶囊返回按钮（方案 B）**：
+1. **内嵌卡片左上角液态玻璃胶囊返回按钮**：
    - 摒弃原本孤立悬挂于卡片上方的独立占位行，彻底消除突兀感与视觉割裂；
    - 采用常驻浮动胶囊（Sticky Floating Pill）：`sticky top-2 sm:top-3 z-30`，随读者向下滑动始终常驻左上角，无需滚回顶部即可一键返回；
-   - **全站统一晶透磨砂玻璃质感 (`.frosted-glass-back-btn`)**：
-     - **磨砂与饱和度增强**：`background-color: rgba(255, 255, 255, 0.65)` 配合 `backdrop-filter: blur(24px) saturate(180%)`，既能自然透出封面与背景的光影，又保持高透光晶莹感；
-     - **高光边框与立体微阴影**：1px 白透微边框（`rgba(255, 255, 255, 0.75)`），内嵌顶层高光（`inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95)`）与双层自然弥散阴影（`0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.05)`）；
-     - **清晰易读**：字色采用高对比深岩灰 `color: #1e293b` 与 `font-semibold`，在暗色封面图及浅色正文卡片上均具备最佳可读性（实用性优先）；
-     - **微交互**：Hover 时上浮 1px、背景亮化至 `0.85`、微阴影扩大，内置 Lucide `ArrowLeft` 箭头向左微移（`-translate-x-1`）；Active 按下时缩放至 `scale-95` 产生清脆机械触感；多语言自动适配（中文 `返回`，英文 `Back`）。
+   - **液态玻璃图层 (`.frosted-glass-back-btn`)**：
+     - **清透基底**：按钮白色底透明度为 0.1；独立 `.liquid-glass-back-surface` 使用轻微渐变和 `blur(8px) saturate(140%) brightness(1.06)`，保留封面色彩和结构，替代原来 0.65 白底与 24px 强磨砂。
+     - **边缘折射**：页面内零尺寸 SVG 定义 `post-back-glass-refraction`。内嵌 SVG 位移图的 R/G 通道分别控制水平/垂直采样，中央维持中性值 128，边缘向内采样。支持 SVG 背景滤镜的浏览器使用 `feDisplacementMap scale="12"`，再叠加 4px 模糊；不支持时使用基础 CSS 玻璃效果。该效果是 Web 近似实现，并非 iOS 原生材质。
+     - **镜面高光**：`::before` 绘制顶部弧形反射；`::after` 通过 mask-composite 排除中心，只留下 1px 渐变高光轮廓。装饰层均为 `pointer-events: none`，文字位于独立 `z-10` 层，不受位移滤镜影响。
+     - **触控与可读性**：最小点击区域为 92 × 44px；文字使用 `#142235` 和轻微白色文字阴影；键盘焦点有明确轮廓。减少透明度或增加对比度偏好下改为浅色实底；强制颜色模式使用系统按钮色。
+     - **微交互**：支持悬停的精细指针下上浮 1px、放大至 1.025，顶部反光轻移、箭头左移 2px；按下缩放至 0.96。减少动态效果偏好下关闭位移与过渡。
+     - **导航与语言**：中文显示 `返回`，英文显示 `Back`；部署前缀先移除末尾斜杠，再拼接 `/posts`，避免依赖 `BASE_URL` 是否以斜杠结尾。
+     - **设计参考**：[Apple 的材质指南](https://developer.apple.com/design/human-interface-guidelines/materials)。装饰保持在导航控件上，不改变正文卡片的磨砂材质。
 2. **两栏自适应栅格与等高拉伸**：
    - 栅格排布：`grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_310px] gap-6 lg:gap-8 items-stretch pb-16`；
    - 重点：使用 `items-stretch` 让右侧 `aside` 高度自动等同于正文 `main`，为 Sticky 垂直居中提供全长滚动轨道；右侧目录卡片在初次挂载时即与视口中央精准对称。
@@ -172,7 +175,7 @@
    - 强制直角无圆角（`border-radius: 0 !important;`）。
 2. **剧院级大图灯箱架构 (Theater-Scale Frosted Lightbox)**：
    - **直挂 Body 突破包含块**：当读者点击正文任意图片时，动态将灯箱挂载至 `document.body`，彻底规避卡片 `backdrop-filter` 与 `overflow: hidden` 的视口陷阱；
-   - **剧院级尺寸与晶透玻璃质感**：`w-[96vw] max-w-[1380px] h-[92vh] sm:h-[94vh]`、`bg-white/45 backdrop-blur-3xl backdrop-saturate-150`、顶层 1px 镜面反光高光（`bg-gradient-to-r from-transparent via-white/90 to-transparent`）；
+   - **剧院级尺寸与晶透玻璃质感**：`w-[96vw] max-w-[1380px] h-[92vh] sm:h-[94vh]`、`bg-white/45 backdrop-blur-3xl backdrop-saturate-150`、顶层 1px 镜面反光高光（`bg-linear-to-r/srgb from-transparent via-white/90 to-transparent`）；
    - **无横线顶栏与中央胶囊**：顶栏不设硬边分割线，正中常驻等宽页码与图注胶囊（如 `1 / 3 · 系统核心分层架构`），右侧设置白玉圆形关闭按钮；
    - **键盘导航与手势支持**：`Escape` 一键关闭、`ArrowLeft` / `ArrowRight` 顺滑切图、点击外层半透遮罩平滑退出；
    - **滚动锁定与路由生命周期安全**：开启时锁定 `document.body.style.overflow = 'hidden'`，关闭或触发 Astro `astro:before-swap` 转场时自动恢复视口滚动并完全释放 DOM 节点。
@@ -270,10 +273,10 @@
 - **原因**：此前为了在暗色封面图上获取视觉反差，使用了粗暴的深色实体背景类名硬编码，破坏了磨砂玻璃的通透光泽感，且缺乏色彩饱和度补偿。
 - **修复**：
   1. 在 `src/styles/global.css` 中独立抽象 `.frosted-glass-back-btn` 专属规范；
-  2. 采用 `rgba(255, 255, 255, 0.65)` 白透基底配合 `backdrop-filter: blur(24px) saturate(180%)`，使穿透的高斯模糊光影保持鲜亮、不发灰；
-  3. 配合 1px 白亮边框（`rgba(255, 255, 255, 0.75)`）、顶层微高光（`inset 0 1px 1.5px rgba(255, 255, 255, 0.95)`）与双层自然弥散阴影（`0 8px 24px -4px rgba(0,0,0,0.12), 0 2px 6px -1px rgba(0,0,0,0.05)`）；
-  4. 文本采用深岩灰 `#1e293b` 与 `font-semibold` 加粗，达成暗色封面与浅色正文卡片上的全天候最高对比度与实用可读性；
-  5. 赋予 Hover 态上浮 1px、底色微亮至 `0.85`、箭头平滑左移（`group-hover:-translate-x-1`）与 Active 态物理弹性按压反馈（`scale-95`）。
+  2. 当前实现改为 0.1 白色清透基底、轻模糊及独立背景折射层，避免强磨砂再次遮住底部内容；
+  3. 用渐变镜面轮廓、顶部弧形高光、上下沿内阴影和柔和投影建立玻璃厚度；
+  4. 将深色加粗文字和箭头置于滤镜之外，增加键盘焦点、减少透明度及强制颜色模式支持；
+  5. 悬停、按压和减少动态效果的处理与当前液态玻璃结构见 1.2 节。
 
 ### 坑 12：Sticky 偏移与内部 Padding-Top 叠加导致侧边目录滚动沉底出界
 - **现象**：当读者向下滚动阅读文章正文时，右侧目录导航栏不仅没有保持垂直居中，反而不断向下坠落滑行，最终几乎脱离浏览器视口底部，只露出顶部标题。
@@ -313,6 +316,12 @@
 - **修复**：
   1. 模态框统一动态挂载至 `document.body`；
   2. 注册 `astro:before-swap` 生命周期钩子，在页面切换前自动执行 `closeArticleLightbox()` 恢复 `document.body.style.overflow` 并完全清理 DOM 节点与键盘事件监听器，实现 100% 内存无泄漏与零残余样式。
+
+### 坑 15：返回地址直接拼接部署前缀，丢失路径分隔符
+
+- **现象**：`BASE_URL` 为 `/naph130-blog` 时，`${BASE_URL}posts` 生成 `/naph130-blogposts`，按钮无法返回文章列表。
+- **修复**：先标准化前缀，再显式拼接 `/posts`。液态玻璃样式仍使用原生 `<a>`，支持键盘和普通链接导航。
+- **验证**：2026-10-07 完成构建检查（0 错误、0 警告）；浏览器检查按钮高度为 44px、键盘焦点可见、SVG 背景滤镜已接入，滚动到正文后胶囊仍常驻，点击返回成功进入 `/naph130-blog/posts`。
 
 
 

@@ -353,7 +353,7 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
       className="relative w-full h-full min-h-[500px] rounded-3xl bg-white/20 backdrop-blur-2xl border border-white/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] overflow-hidden select-none"
     >
       {/* 顶部镜面高光线条 */}
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none z-20" />
+      <div className="absolute inset-x-0 top-0 h-[1px] bg-linear-to-r/srgb from-transparent via-white/80 to-transparent pointer-events-none z-20" />
 
       {/* 能量射线 Canvas */}
       <canvas
@@ -453,7 +453,7 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
             </div>
 
             {/* 悬停光晕 */}
-            <div className="absolute top-0 left-0 w-24 h-24 -z-10 rounded-full bg-sky-400/25 blur-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute top-0 left-0 w-24 h-24 -z-10 rounded-full bg-sky-400/25 blur-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </div>
         );
       })}
@@ -477,7 +477,7 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
           className="z-30 w-64 sm:w-72 rounded-2xl bg-white/45 dark:bg-white/35 backdrop-blur-3xl backdrop-saturate-150 border border-white/70 shadow-[0_24px_60px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.9)] p-4 sm:p-5 flex flex-col gap-3 select-text animate-in fade-in zoom-in-95 duration-200"
         >
           {/* 顶栏高光反光 */}
-          <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-[1px] bg-linear-to-r/srgb from-transparent via-white/90 to-transparent pointer-events-none" />
 
           {/* 1. ID 头部 */}
           <div className="flex items-center gap-2.5 pb-2.5 border-b border-white/30">
@@ -504,7 +504,7 @@ export const FloatingFriends: React.FC<FloatingFriendsProps> = ({
               href={activeHud.friend.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-mono text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all"
+              className="w-full py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-mono text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-all"
             >
               <span>{isEnglish ? 'Visit' : '访问'}</span>
               <ExternalLink className="w-3.5 h-3.5" />

@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -13,12 +13,10 @@ export default defineConfig({
     host: true,
     port: 4321,
   },
-  integrations: [
-    react(),
-    tailwind({
-      applyBaseStyles: false,
-    }),
-  ],
+  integrations: [react()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     processor: unified({
       remarkPlugins: [remarkMath],

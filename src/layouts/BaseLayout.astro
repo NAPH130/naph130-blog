@@ -4,6 +4,11 @@ import { getImage } from 'astro:assets';
 import bgImage from '@/assets/background.jpg';
 import HeaderNav from '@/components/HeaderNav';
 import { siteConfig } from '@/site.config';
+import {
+  PAGE_SETTINGS_STORAGE_KEY,
+  FROSTED_GLASS_BACKGROUND,
+  frostedGlassCategory,
+} from '@/settings';
 import '@/styles/global.css';
 
 interface Props {
@@ -40,34 +45,30 @@ const optimizedBg = await getImage({ src: bgImage });
     <ClientRouter />
 
     <!-- 预先从 localStorage 注入用户自定义磨砂变量及页面初始状态变量 -->
-    <script is:inline>
+    <script is:inline define:vars={{
+      basePath: import.meta.env.BASE_URL,
+      settingsStorageKey: PAGE_SETTINGS_STORAGE_KEY,
+      frostedGlassDefaults: frostedGlassCategory.defaultValues,
+      frostedGlassBackground: FROSTED_GLASS_BACKGROUND,
+    }}>
       (function () {
         try {
           const root = document.documentElement;
-          const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
-          const current = window.location.pathname.replace(/\/$/, '') || '/';
+          const base = (basePath || '/').replace(/\/+$/, '') || '/';
+          const current = window.location.pathname.replace(/\/+$/, '') || '/';
           const isHome = current === '/' || current === '' || current === base;
-          const saved = localStorage.getItem('naph130_page_settings');
+          const saved = localStorage.getItem(settingsStorageKey);
           
-          let blur = '40px';
-          let bg = 'rgba(255, 255, 255, 0.28)';
-          let opacity = '1';
+          let values = frostedGlassDefaults;
 
           if (saved) {
             const data = JSON.parse(saved);
-            const fg = data.frostedGlass;
-            if (fg) {
-              if (fg.enabled === false) {
-                blur = '0px';
-                bg = 'transparent';
-                opacity = '0';
-              } else {
-                blur = (fg.blur ?? 40) + 'px';
-                opacity = '1';
-                bg = 'rgba(255, 255, 255, 0.28)';
-              }
-            }
+            values = { ...frostedGlassDefaults, ...data.frostedGlass };
           }
+
+          const blur = values.enabled ? values.blur + 'px' : '0px';
+          const bg = values.enabled ? frostedGlassBackground : 'transparent';
+          const opacity = values.enabled ? '1' : '0';
 
           root.style.setProperty('--glass-blur', blur);
           root.style.setProperty('--glass-bg', bg);
@@ -111,29 +112,25 @@ const optimizedBg = await getImage({ src: bgImage });
     />
 
     <!-- 路由生命周期事件调度脚本 -->
-    <script is:inline>
-      function syncPageOverlay() {
-        const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
-        const path = window.location.pathname.replace(/\/$/, '') || '/';
-        const isHome = path === '/' || path === '' || path === base;
+    <script>
+      import { initAndApplySettings } from '@/settings';
+
+      // Astro 会交换 <html> 属性，持久化遮罩节点并不会保留根节点变量。
+      // 先把当前值带入新文档，再在交换完成后应用目标页面的状态。
+      document.addEventListener('astro:before-swap', (event) => {
         const root = document.documentElement;
-
-        if (isHome) {
-          root.style.setProperty('--page-blur', '0px');
-          root.style.setProperty('--page-bg', 'transparent');
-          root.style.setProperty('--page-opacity', '0');
-        } else {
-          const blur = root.style.getPropertyValue('--glass-blur') || '40px';
-          const bg = root.style.getPropertyValue('--glass-bg') || 'rgba(255, 255, 255, 0.28)';
-          const opacity = root.style.getPropertyValue('--glass-opacity') || '1';
-
-          root.style.setProperty('--page-blur', blur);
-          root.style.setProperty('--page-bg', bg);
-          root.style.setProperty('--page-opacity', opacity);
+        const nextRoot = event.newDocument.documentElement;
+        for (const variable of [
+          '--glass-blur', '--glass-bg', '--glass-opacity',
+          '--page-blur', '--page-bg', '--page-opacity',
+        ]) {
+          const value = root.style.getPropertyValue(variable);
+          if (value) nextRoot.style.setProperty(variable, value);
         }
-      }
+      });
 
-      document.addEventListener('astro:page-load', syncPageOverlay);
+      initAndApplySettings();
+      document.addEventListener('astro:after-swap', initAndApplySettings);
     </script>
 
     <!-- 50层：顶部导航栏 -->

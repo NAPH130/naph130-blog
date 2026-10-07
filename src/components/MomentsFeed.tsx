@@ -409,7 +409,7 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
                   src={images[currentIndex]}
                   alt={`Moment image ${currentIndex + 1} of ${total}`}
                   onLoad={(e) => handleImageLoad(images[currentIndex], e)}
-                  className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain rounded-none pointer-events-none select-none drop-shadow-sm"
+                  className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain rounded-none pointer-events-none select-none drop-shadow-xs"
                   loading="eager"
                 />
                 {/* 悬浮放大提示微角标 */}
@@ -435,7 +435,7 @@ export const MomentCarousel: React.FC<MomentCarouselProps> = ({ images }) => {
                   src={images[currentIndex]}
                   alt={`Moment image ${currentIndex + 1} of ${total}`}
                   onLoad={(e) => handleImageLoad(images[currentIndex], e)}
-                  className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain rounded-none pointer-events-none select-none drop-shadow-sm"
+                  className="relative z-10 max-w-full max-h-full w-auto h-auto object-contain rounded-none pointer-events-none select-none drop-shadow-xs"
                   loading="eager"
                 />
               </div>
@@ -587,7 +587,7 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
     const emptyTitle = t('pages.momentsEmptyTitle' as I18nKey, locale);
     return (
       <div className="h-full min-h-[360px] flex flex-col items-center justify-center p-8 text-neutral-600 font-mono select-none">
-        <div className="w-16 h-16 rounded-3xl bg-white/30 backdrop-blur-xl border border-white/60 flex items-center justify-center shadow-sm mb-4">
+        <div className="w-16 h-16 rounded-3xl bg-white/30 backdrop-blur-xl border border-white/60 flex items-center justify-center shadow-xs mb-4">
           <Sparkles className="w-7 h-7 text-neutral-400" />
         </div>
         <p className="text-sm sm:text-base text-neutral-700 font-medium tracking-wide">
@@ -665,7 +665,7 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
             <section key={yearGroup.year} className="relative">
               {/* 年份主标头：晶透流光胶囊 */}
               <div className="flex items-center gap-3 relative z-10 mb-7">
-                <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-sky-500/20 border border-white/60 shrink-0">
+                <div className="w-9 h-9 rounded-2xl bg-linear-to-tr/srgb from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-sky-500/20 border border-white/60 shrink-0">
                   <Sparkles className="w-4 h-4 text-white drop-shadow-xs" />
                 </div>
                 <div className="flex items-baseline gap-2.5">
@@ -681,7 +681,7 @@ export const MomentsFeed: React.FC<MomentsFeedProps> = ({ momentsByLocale }) => 
               {/* 年份下属流：左侧优雅流光时间轴垂直贯穿 (中轴线固定在 left: 16px) */}
               <div className="relative pl-8">
                 {/* 垂直时间轴脊柱流光线 (中轴在 x = 16px, 故 left: 15px, 宽 2px) */}
-                <div className="absolute left-[15px] top-2 bottom-3 w-[2px] bg-gradient-to-b from-sky-400/60 via-indigo-400/35 to-sky-300/10 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.25)]" />
+                <div className="absolute left-[15px] top-2 bottom-3 w-[2px] bg-linear-to-b/srgb from-sky-400/60 via-indigo-400/35 to-sky-300/10 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.25)]" />
 
                 {/* 月份分组 */}
                 <div className="space-y-8">

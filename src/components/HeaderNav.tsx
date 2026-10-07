@@ -208,7 +208,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
                 type="button"
                 aria-label="语言切换"
                 onClick={() => setIsLangOpen((prev) => !prev)}
-                className={`p-2 transition-all focus:outline-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] flex items-center justify-center ${
+                className={`p-2 transition-all focus:outline-hidden drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] flex items-center justify-center ${
                   isLangOpen ? 'opacity-100 scale-105' : 'opacity-85 hover:opacity-100'
                 }`}
               >
@@ -266,7 +266,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ currentPath = '/' }) => {
               type="button"
               aria-label="设置"
               onClick={() => setIsSettingsOpen((prev) => !prev)}
-              className={`p-2 transition-all focus:outline-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] ${
+              className={`p-2 transition-all focus:outline-hidden drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] ${
                 isSettingsOpen ? 'rotate-90 text-white opacity-100' : 'opacity-85 hover:opacity-100'
               }`}
             >

@@ -1,11 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Outfit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@700;800&family=Quicksand:wght@700&display=swap');
 @import 'katex/dist/katex.min.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' source('../');
+
+/* 保持原来的 class 暗色模式，由祖先元素的 .dark 类触发。 */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  /* 保持 v3 的默认边框、占位文本和按钮光标，避免迁移改变控件外观。 */
+  *,
+  ::before,
+  ::after,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
   :root {
     --glass-blur: 40px;
     --glass-opacity: 1;
@@ -142,37 +162,150 @@
   box-shadow: 0 14px 36px -8px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
 }
-/* 文章详情页专属晶透磨砂玻璃胶囊返回按钮 (Frosted Glass Pill) */
+/* 液态玻璃返回胶囊：背景折射、镜面边缘与前景文字独立分层。 */
 .frosted-glass-back-btn {
-  background-color: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 92px;
+  min-height: 44px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow:
-    0 8px 24px -4px rgba(0, 0, 0, 0.12),
-    0 2px 6px -1px rgba(0, 0, 0, 0.05),
-    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
-  color: #1e293b;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    0 8px 24px -8px rgba(15, 23, 42, 0.28),
+    0 2px 5px rgba(15, 23, 42, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.35);
+  color: #142235;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  transition:
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 280ms ease,
+    box-shadow 280ms ease;
 }
 
-.frosted-glass-back-btn:hover {
-  background-color: rgba(255, 255, 255, 0.85);
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow:
-    0 12px 28px -4px rgba(0, 0, 0, 0.18),
-    0 4px 10px -1px rgba(0, 0, 0, 0.08),
-    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
-  color: #0f172a;
-  transform: translateY(-1px);
+.liquid-glass-back-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.02) 48%, rgba(255, 255, 255, 0.1));
+  -webkit-backdrop-filter: blur(8px) saturate(140%) brightness(1.06);
+  backdrop-filter: blur(8px) saturate(140%) brightness(1.06);
+}
+
+/* 支持 SVG 背景滤镜时增加轻微边缘折射；文字不进入滤镜。 */
+@supports (backdrop-filter: url('#post-back-glass-refraction')) {
+  .liquid-glass-back-surface {
+    backdrop-filter: url('#post-back-glass-refraction') blur(4px) saturate(140%) brightness(1.06);
+  }
+}
+
+.frosted-glass-back-btn::before,
+.frosted-glass-back-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 顶部弧形反光随悬停轻移，不使用循环闪光动画。 */
+.frosted-glass-back-btn::before {
+  background: radial-gradient(ellipse at 24% 0%, rgba(255, 255, 255, 0.5), transparent 65%);
+  opacity: 0.5;
+  transform: translateX(-12%);
+  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1), opacity 280ms ease;
+}
+
+/* 只绘制薄的镜面轮廓，让中心保持通透。 */
+.frosted-glass-back-btn::after {
+  padding: 1px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.6) 78%, rgba(255, 255, 255, 0.2));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.liquid-glass-back-arrow {
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .frosted-glass-back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px) scale(1.025);
+    box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.3), inset 0 1px 1px rgba(255, 255, 255, 1), inset 0 -1px 1px rgba(255, 255, 255, 0.45);
+  }
+
+  .frosted-glass-back-btn:hover::before {
+    transform: translateX(12%);
+    opacity: 0.85;
+  }
+
+  .frosted-glass-back-btn:hover .liquid-glass-back-arrow {
+    transform: translateX(-2px);
+  }
 }
 
 .frosted-glass-back-btn:active {
-  background-color: rgba(255, 255, 255, 0.9);
-  transform: translateY(0px) scale(0.96);
-  box-shadow:
-    0 4px 12px -2px rgba(0, 0, 0, 0.12),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.22);
+  transform: scale(0.96);
+  transition-duration: 120ms;
+}
+
+.frosted-glass-back-btn:focus-visible {
+  outline: 2px solid #0f172a;
+  outline-offset: 4px;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .frosted-glass-back-btn,
+  .frosted-glass-back-btn:hover,
+  .frosted-glass-back-btn:active {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .frosted-glass-back-btn,
+  .frosted-glass-back-btn:hover,
+  .frosted-glass-back-btn:active {
+    background-color: #f1f5f9;
+  }
+
+  .liquid-glass-back-surface {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frosted-glass-back-btn,
+  .frosted-glass-back-btn::before,
+  .liquid-glass-back-arrow {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .frosted-glass-back-btn,
+  .frosted-glass-back-btn:hover,
+  .frosted-glass-back-btn:active {
+    background: ButtonFace;
+    border-color: ButtonText;
+    color: ButtonText;
+    text-shadow: none;
+    box-shadow: none;
+  }
+
+  .liquid-glass-back-surface,
+  .frosted-glass-back-btn::before,
+  .frosted-glass-back-btn::after {
+    display: none;
+  }
 }
 
 /* 文章详情页顶部封面遮罩：上方完整清晰，下方渐变平滑消融融入磨砂正文卡片 */

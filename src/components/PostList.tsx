@@ -51,7 +51,7 @@ export const PostList: React.FC<PostListProps> = ({ postsByLocale }) => {
           <a
             key={post.id}
             href={`${base}/posts/${post.slug}`}
-            className="group relative flex flex-col md:flex-row items-stretch justify-between rounded-2xl bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/25 hover:border-white/40 shadow-sm hover:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 overflow-hidden select-none cursor-pointer block no-underline text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50"
+            className="group relative flex flex-col md:flex-row items-stretch justify-between rounded-2xl bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/25 hover:border-white/40 shadow-xs hover:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 overflow-hidden select-none cursor-pointer block no-underline text-inherit focus:outline-hidden focus-visible:ring-2 focus-visible:ring-sky-500/50"
           >
             {/* 左侧正文与元数据区 */}
             <div className="flex-1 p-6 sm:p-7 flex flex-col justify-between min-w-0 z-10">

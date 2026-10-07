@@ -118,29 +118,30 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
     <aside className="w-full h-full min-h-0 flex flex-col gap-3.5 select-none font-sans">
       {/* 1. 个人简介卡片：与右侧面板完全对齐的磨砂质感，色调生动不发灰 */}
       <div
-        className={`frosted-glass-card rounded-2xl p-4 sm:p-5 text-center relative flex flex-col justify-between ${
+        className={`frosted-glass-card rounded-2xl p-4 sm:p-5 text-center relative flex flex-col ${
           showStats ? 'flex-1 min-h-[190px]' : 'flex-[0.9] min-h-[220px]'
         }`}
       >
-        {/* 圆形头像 */}
-        <div className="mx-auto w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-full border-2 border-white/80 shadow-sm overflow-hidden relative group">
-          <img
-            src={`${(import.meta.env.BASE_URL || '/').replace(/\/$/, '')}/avatar.jpg`}
-            alt="NAPH130"
-            className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-300 group-hover:scale-105"
-            onError={(e) => {
-              (e.currentTarget as HTMLElement).style.display = 'none';
-            }}
-          />
+        {/* 头像与昵称整体居中于统计栏上方的剩余空间 */}
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-center">
+          <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 shrink-0 rounded-full border-2 border-white/80 shadow-xs overflow-hidden relative group">
+            <img
+              src={`${(import.meta.env.BASE_URL || '/').replace(/\/$/, '')}/avatar.jpg`}
+              alt="NAPH130"
+              className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                (e.currentTarget as HTMLElement).style.display = 'none';
+              }}
+            />
+          </div>
+
+          <h3 className="mt-2 text-lg sm:text-xl font-bold font-['Comfortaa'] tracking-normal text-neutral-900">
+            NAPH130
+          </h3>
         </div>
 
-        {/* 名字 */}
-        <h3 className="mt-2 text-lg sm:text-xl font-bold font-['Comfortaa'] tracking-normal text-neutral-900">
-          NAPH130
-        </h3>
-
         {/* 核心指标统计 */}
-        <div className="grid grid-cols-3 gap-2 mt-auto pt-3 border-t border-white/30">
+        <div className="grid grid-cols-3 gap-2 shrink-0 pt-3 border-t border-white/30">
           <div className="flex flex-col items-center">
             <span className="text-base sm:text-lg font-bold font-mono text-neutral-900">
               {currentPostCount}
@@ -284,7 +285,7 @@ export const BlogSidebar: React.FC<BlogSidebarProps> = ({
               key={idx}
               className={`flex items-center justify-center rounded-md transition-all ${
                 cell.isToday
-                  ? 'bg-neutral-900 text-white font-bold shadow-sm scale-105'
+                  ? 'bg-neutral-900 text-white font-bold shadow-xs scale-105'
                   : cell.isCurrentMonth
                     ? 'text-neutral-800 font-semibold hover:bg-black/5'
                     : 'text-neutral-400/50'

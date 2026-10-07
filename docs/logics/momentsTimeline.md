@@ -192,7 +192,7 @@ graph LR
 
 1. **主脊柱绝对定位**：
    - 垂直流光主干定位于 `left: 15px sm:left: 17px`。
-   - 采用线性透明度流光渐变：`bg-gradient-to-b from-sky-400/60 via-indigo-400/35 to-sky-300/10`，并带有 `shadow-[0_0_8px_rgba(56,189,248,0.25)]`。
+   - 采用线性透明度流光渐变：`bg-linear-to-b/srgb from-sky-400/60 via-indigo-400/35 to-sky-300/10`，并带有 `shadow-[0_0_8px_rgba(56,189,248,0.25)]`。
 2. **月份中心节点**：
    - 月份徽章左侧的流光圆环微节点定位于 `-left-[19px] sm:-left-[21px]`，其几何中心精确重合在脊柱中轴线上。
 3. **日期徽章与水平分叉微引线**：
